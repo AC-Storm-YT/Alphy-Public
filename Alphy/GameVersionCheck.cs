@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Diagnostics;
 using System.IO;
 using System.Net;
@@ -9,7 +9,7 @@ namespace Alphy
     {
         private const string ExeRelativePath = @"..\..\Binaries\Win64\RocketLeague.exe";
 
-        private const string SupportedVersionUrl = "https://www.dropbox.com/scl/fi/zlzh4cfqv4khkgp6u7ph0/gameversion.txt?rlkey=hhah3ay5zklmdxnb5bugkqb5s&st=3qhk2kmk&dl=1";
+        private const string SupportedVersionUrl = "https://raw.githubusercontent.com/AC-Storm-YT/alphy.github.io/refs/heads/main/gameversion.txt";
 
         private const string LiveBuildUrl = "https://raw.githubusercontent.com/AC-Storm-YT/alphy.github.io/refs/heads/main/rlsteambuild.txt";
         private const string SupportedBuildUrl = "https://raw.githubusercontent.com/AC-Storm-YT/alphy.github.io/refs/heads/main/supportedbuild";

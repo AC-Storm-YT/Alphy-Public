@@ -20,7 +20,9 @@ namespace Alphy
         private class ModItem
         {
             public MaterialCheckbox Checkbox { get; set; }
+            public string ModName { get; set; }
             public string[] Files { get; set; }
+            public ModCard Card { get; set; }
         }
 
         private List<ModItem> activeMods = new List<ModItem>();
@@ -178,26 +180,43 @@ namespace Alphy
 
         private void AddModToPanel(FlowLayoutPanel panel, string label, string[] files, string category)
         {
-            var chk = new MaterialCheckbox
+            string modName = label;
+            string replacesName = "";
+
+            int replaceIndex = label.IndexOf("(Replaces", StringComparison.OrdinalIgnoreCase);
+
+            if (replaceIndex > 0)
             {
-                Text = label,
-                AutoSize = true,
-                Tag = category,
+                modName = label.Substring(0, replaceIndex).Trim();
+                replacesName = label.Substring(replaceIndex).Trim();
+            }
+            else
+            {
+                int bracketIndex = label.IndexOf("(");
+                if (bracketIndex > 0)
+                {
+                    modName = label.Substring(0, bracketIndex).Trim();
+                    replacesName = label.Substring(bracketIndex).Trim();
+                }
+            }
+
+            ModCard card = new ModCard(label, category, modName, replacesName)
+            {
                 Margin = new Padding(10, 5, 0, 0)
             };
 
-            chk.CheckedChanged += (s, e) => {
-                if (chk.Checked)
+            card.Checkbox.CheckedChanged += (s, e) => {
+                if (card.Checkbox.Checked)
                 {
-                    foreach (var mod in activeMods.Where(m => (string)m.Checkbox.Tag == category && m.Checkbox != chk))
+                    foreach (var mod in activeMods.Where(m => (string)m.Checkbox.Tag == category && m.Checkbox != card.Checkbox))
                     {
                         mod.Checkbox.Checked = false;
                     }
                 }
             };
 
-            activeMods.Add(new ModItem { Checkbox = chk, Files = files });
-            panel.Controls.Add(chk);
+            activeMods.Add(new ModItem { Checkbox = card.Checkbox, ModName = label, Files = files, Card = card });
+            panel.Controls.Add(card);
         }
 
         private void LoadSavedModStatesBackground()
@@ -206,8 +225,7 @@ namespace Alphy
 
             foreach (var mod in activeMods)
             {
-                string modName = "";
-                this.Invoke((MethodInvoker)delegate { modName = mod.Checkbox.Text; });
+                string modName = mod.ModName;
 
                 if (savedModData.ContainsKey(modName))
                 {
@@ -252,7 +270,6 @@ namespace Alphy
                                         LogToConsole($"Warning: Could not update backup for {fileName}. File might be locked.");
                                     }
                                 }
-
                             }
                         }
                     }
@@ -317,11 +334,9 @@ namespace Alphy
             string localVer = GameVersionCheck.GetLocalGameVersion(gamePath);
             string supportedVer = GameVersionCheck.GetSupportedVersion();
 
-            // Fetch build versions from GitHub
             string liveBuild = GameVersionCheck.GetLiveBuildVersion();
             string supportedBuild = GameVersionCheck.GetSupportedBuildVersion();
 
-            // Determine if there is a mismatch on either the local EXE or the live server build
             bool isExeMismatch = (localVer != "Not Found" && localVer != "Error" && localVer != supportedVer);
             bool isBuildMismatch = (liveBuild != "Unknown" && supportedBuild != "Unknown" && liveBuild != supportedBuild);
 
@@ -358,8 +373,14 @@ namespace Alphy
                 SmartUpdateBackups(localVer);
 
                 LogToConsole("System: Validating backups...");
-
                 await CreateInitialBackups();
+
+                LogToConsole("System: Synchronizing mod icons...");
+
+                foreach (var mod in activeMods)
+                {
+                    await mod.Card.LoadImageAsync();
+                }
 
                 LogToConsole("System: Ready.");
                 ToggleControls(true);
@@ -468,7 +489,7 @@ namespace Alphy
 
             var modStates = activeMods.Select(m => new
             {
-                ModName = m.Checkbox.Text,
+                ModName = m.ModName,
                 Files = m.Files,
                 IsChecked = m.Checkbox.Checked
             }).ToList();
@@ -591,6 +612,12 @@ namespace Alphy
                     LogToConsole("System: Validating backups for new mods...");
                     await CreateInitialBackups();
 
+                    LogToConsole("System: Synchronizing mod icons...");
+                    foreach (var mod in activeMods)
+                    {
+                        await mod.Card.LoadImageAsync();
+                    }
+
                     await Task.Run(() =>
                     {
                         LoadSavedModStatesBackground();
@@ -612,6 +639,12 @@ namespace Alphy
                     InitializeModList();
 
                     await CreateInitialBackups();
+
+                    LogToConsole("System: Synchronizing mod icons...");
+                    foreach (var mod in activeMods)
+                    {
+                        await mod.Card.LoadImageAsync();
+                    }
 
                     await Task.Run(() =>
                     {

@@ -77,7 +77,14 @@
       <DependentUpon>FormRemoveMod.cs</DependentUpon>
     </Compile>
     <Compile Include="GameVersionCheck.cs" />
+    <Compile Include="ImageCache.cs" />
     <Compile Include="Lockdown.cs" />
+    <Compile Include="ModCard.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="ModCard.Designer.cs">
+      <DependentUpon>ModCard.cs</DependentUpon>
+    </Compile>
     <Compile Include="ProcessCheck.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

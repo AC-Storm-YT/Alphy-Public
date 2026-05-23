@@ -12,7 +12,7 @@ A comprehensive, open-source Rocket League cosmetic mod manager designed for saf
 * [Installation & First Setup](#installation)
 * [How to Use Alphy](#how-to-use)
 * [How It Works](#how-it-works)
-* [Community & Support](#community)
+* [Community, Tools & Support](#community)
 
 ---
 
@@ -76,7 +76,8 @@ Alphy organizes your custom files into 11 dedicated, easy-to-navigate categories
 **Importing a Mod:**
 1. Click the **"IMPORT NEW MOD"** button at the bottom left of the dashboard.
 2. Enter the name of your mod (e.g., *Titanium White Fennec*).
-3. Specify the item it replaces (e.g., *Octane*).
+   > 💡 **Pro Tip:** Use the official [Alphy Items Database](https://ac-storm-yt.github.io/alphy-items.github.io/) to search for the item you are using. Copy and paste the exact ID / Name from the site into Alphy, and the app will automatically attach the correct item image to your mod!
+3. Specify the item it replaces. 
 4. Select the appropriate category from the dropdown menu.
 5. Click **"SELECT MOD FILES"** and choose your `.upk` or `.bnk` files.
 6. Click **"ADD MOD"**. Alphy will refresh and display your new item in the corresponding category tab.
@@ -100,10 +101,11 @@ For developers and curious users, here is how Alphy manages your files locally:
 
 ---
 
-## <a id="community"></a>🤝 Community & Support
+## <a id="community"></a>🤝 Community, Tools & Support
 
 Have questions, want to report a bug, or looking for cosmetic files to download? Join the community!
 
+* 🖼️ **Asset Database:** [Alphy Items Database](https://ac-storm-yt.github.io/alphy-items.github.io/) (Find exact item IDs for mod importation)
 * 🌐 **Website:** [Alphy Official Site](https://ac-storm-yt.github.io/alphy.github.io/)
 * 💬 **Discord:** [Join the Alphy Community Server](https://discord.gg/UuC5j8smR7)
 

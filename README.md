@@ -84,7 +84,7 @@ Alphy now supports an extensible Plugin System! Plugins allow you to add powerfu
 To access the Plugin Manager, click the **"Plugins"** button located at the bottom of the right sidebar. This menu allows you to browse, download, install, and update official plugins directly from the cloud with a single click.
 
 ### Official Plugin: Alphy Swapper
-The **Alphy Swapper** is an advanced, offline asset swapper that allows you to generate your own custom mods by swapping internal Rocket League `.upk` files. 
+The **Alphy Swapper** is an advanced, asset swapper that allows you to generate your own custom mods by swapping internal Rocket League `.upk` files. 
 
 Because it is a native plugin, it is fully automated:
 * **Zero Configuration:** It automatically pulls your game directory straight from Alphy's memory. You don't need to manually link any folders.

@@ -19,9 +19,10 @@
             this.panelBottom = new System.Windows.Forms.Panel();
             this.btnChangeFolder = new MaterialSkin.Controls.MaterialButton();
             this.btnUpdate = new MaterialSkin.Controls.MaterialButton();
+            this.btnPlugins = new MaterialSkin.Controls.MaterialButton();
+            this.btnSave = new MaterialSkin.Controls.MaterialButton();
             this.btnRemoveModWizard = new MaterialSkin.Controls.MaterialButton();
             this.btnImportMod = new MaterialSkin.Controls.MaterialButton();
-            this.btnSave = new MaterialSkin.Controls.MaterialButton();
             this.txtConsole = new System.Windows.Forms.RichTextBox();
             this.panelSidebar = new System.Windows.Forms.Panel();
             this.btnCatAudio = new System.Windows.Forms.Button();
@@ -49,9 +50,10 @@
             this.panelBottom.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(40)))), ((int)(((byte)(40)))), ((int)(((byte)(40)))));
             this.panelBottom.Controls.Add(this.btnChangeFolder);
             this.panelBottom.Controls.Add(this.btnUpdate);
+            this.panelBottom.Controls.Add(this.btnPlugins);
+            this.panelBottom.Controls.Add(this.btnSave);
             this.panelBottom.Controls.Add(this.btnRemoveModWizard);
             this.panelBottom.Controls.Add(this.btnImportMod);
-            this.panelBottom.Controls.Add(this.btnSave);
             this.panelBottom.Controls.Add(this.txtConsole);
             this.panelBottom.Dock = System.Windows.Forms.DockStyle.Bottom;
             this.panelBottom.Location = new System.Drawing.Point(3, 627);
@@ -88,7 +90,7 @@
             this.btnUpdate.Depth = 0;
             this.btnUpdate.HighEmphasis = true;
             this.btnUpdate.Icon = global::Alphy.Properties.Resources.arrows_rotate_solid;
-            this.btnUpdate.Location = new System.Drawing.Point(840, 194);
+            this.btnUpdate.Location = new System.Drawing.Point(869, 194);
             this.btnUpdate.Margin = new System.Windows.Forms.Padding(4, 6, 4, 6);
             this.btnUpdate.MouseState = MaterialSkin.MouseState.HOVER;
             this.btnUpdate.Name = "btnUpdate";
@@ -99,6 +101,46 @@
             this.btnUpdate.Type = MaterialSkin.Controls.MaterialButton.MaterialButtonType.Contained;
             this.btnUpdate.UseAccentColor = false;
             this.btnUpdate.Click += new System.EventHandler(this.btnUpdate_Click);
+            // 
+            // btnPlugins
+            // 
+            this.btnPlugins.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
+            this.btnPlugins.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink;
+            this.btnPlugins.Density = MaterialSkin.Controls.MaterialButton.MaterialButtonDensity.Default;
+            this.btnPlugins.Depth = 0;
+            this.btnPlugins.HighEmphasis = true;
+            this.btnPlugins.Icon = null;
+            this.btnPlugins.Location = new System.Drawing.Point(759, 194);
+            this.btnPlugins.Margin = new System.Windows.Forms.Padding(4, 6, 4, 6);
+            this.btnPlugins.MouseState = MaterialSkin.MouseState.HOVER;
+            this.btnPlugins.Name = "btnPlugins";
+            this.btnPlugins.NoAccentTextColor = System.Drawing.Color.Empty;
+            this.btnPlugins.Size = new System.Drawing.Size(100, 36);
+            this.btnPlugins.TabIndex = 13;
+            this.btnPlugins.Text = "PLUGINS";
+            this.btnPlugins.Type = MaterialSkin.Controls.MaterialButton.MaterialButtonType.Contained;
+            this.btnPlugins.UseAccentColor = true;
+            this.btnPlugins.Click += new System.EventHandler(this.btnPlugins_Click);
+            // 
+            // btnSave
+            // 
+            this.btnSave.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
+            this.btnSave.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink;
+            this.btnSave.Density = MaterialSkin.Controls.MaterialButton.MaterialButtonDensity.Default;
+            this.btnSave.Depth = 0;
+            this.btnSave.HighEmphasis = true;
+            this.btnSave.Icon = global::Alphy.Properties.Resources.floppy_disk_regular;
+            this.btnSave.Location = new System.Drawing.Point(592, 194);
+            this.btnSave.Margin = new System.Windows.Forms.Padding(4, 6, 4, 6);
+            this.btnSave.MouseState = MaterialSkin.MouseState.HOVER;
+            this.btnSave.Name = "btnSave";
+            this.btnSave.NoAccentTextColor = System.Drawing.Color.Empty;
+            this.btnSave.Size = new System.Drawing.Size(157, 36);
+            this.btnSave.TabIndex = 3;
+            this.btnSave.Text = "SAVE CHANGES";
+            this.btnSave.Type = MaterialSkin.Controls.MaterialButton.MaterialButtonType.Contained;
+            this.btnSave.UseAccentColor = true;
+            this.btnSave.Click += new System.EventHandler(this.btnSave_Click);
             // 
             // btnRemoveModWizard
             // 
@@ -140,30 +182,10 @@
             this.btnImportMod.UseAccentColor = true;
             this.btnImportMod.Click += new System.EventHandler(this.btnImportMod_Click);
             // 
-            // btnSave
-            // 
-            this.btnSave.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
-            this.btnSave.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink;
-            this.btnSave.Density = MaterialSkin.Controls.MaterialButton.MaterialButtonDensity.Default;
-            this.btnSave.Depth = 0;
-            this.btnSave.HighEmphasis = true;
-            this.btnSave.Icon = global::Alphy.Properties.Resources.floppy_disk_regular;
-            this.btnSave.Location = new System.Drawing.Point(643, 194);
-            this.btnSave.Margin = new System.Windows.Forms.Padding(4, 6, 4, 6);
-            this.btnSave.MouseState = MaterialSkin.MouseState.HOVER;
-            this.btnSave.Name = "btnSave";
-            this.btnSave.NoAccentTextColor = System.Drawing.Color.Empty;
-            this.btnSave.Size = new System.Drawing.Size(157, 36);
-            this.btnSave.TabIndex = 3;
-            this.btnSave.Text = "SAVE CHANGES";
-            this.btnSave.Type = MaterialSkin.Controls.MaterialButton.MaterialButtonType.Contained;
-            this.btnSave.UseAccentColor = true;
-            this.btnSave.Click += new System.EventHandler(this.btnSave_Click);
-            // 
             // txtConsole
             // 
-            this.txtConsole.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
-            | System.Windows.Forms.AnchorStyles.Left) 
+            this.txtConsole.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom)
+            | System.Windows.Forms.AnchorStyles.Left)
             | System.Windows.Forms.AnchorStyles.Right)));
             this.txtConsole.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(30)))), ((int)(((byte)(30)))), ((int)(((byte)(30)))));
             this.txtConsole.Cursor = System.Windows.Forms.Cursors.IBeam;
@@ -178,6 +200,7 @@
             // 
             // panelSidebar
             // 
+            this.panelSidebar.AutoScroll = true;
             this.panelSidebar.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(30)))), ((int)(((byte)(30)))), ((int)(((byte)(30)))));
             this.panelSidebar.Controls.Add(this.btnCatAudio);
             this.panelSidebar.Controls.Add(this.btnCatTopper);
@@ -440,7 +463,7 @@
             // 
             // txtSearch
             // 
-            this.txtSearch.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            this.txtSearch.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left)
             | System.Windows.Forms.AnchorStyles.Right)));
             this.txtSearch.AnimateReadOnly = false;
             this.txtSearch.BorderStyle = System.Windows.Forms.BorderStyle.None;
@@ -497,6 +520,7 @@
         private MaterialSkin.Controls.MaterialButton btnSave;
         private MaterialSkin.Controls.MaterialButton btnChangeFolder;
         private MaterialSkin.Controls.MaterialButton btnUpdate;
+        private MaterialSkin.Controls.MaterialButton btnPlugins;
         private MaterialSkin.Controls.MaterialButton btnImportMod;
         private MaterialSkin.Controls.MaterialButton btnRemoveModWizard;
         private MaterialSkin.Controls.MaterialTabControl tabControl1;

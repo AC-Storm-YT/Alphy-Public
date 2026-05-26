@@ -70,6 +70,12 @@
     <Compile Include="FormAddMod.Designer.cs">
       <DependentUpon>FormAddMod.cs</DependentUpon>
     </Compile>
+    <Compile Include="FormPlugins.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="FormPlugins.Designer.cs">
+      <DependentUpon>FormPlugins.cs</DependentUpon>
+    </Compile>
     <Compile Include="FormRemoveMod.cs">
       <SubType>Form</SubType>
     </Compile>

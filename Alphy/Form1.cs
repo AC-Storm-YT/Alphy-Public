@@ -10,10 +10,11 @@ using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using static Alphy.Form1;
 
 namespace Alphy
 {
-    public partial class Form1 : MaterialForm
+    public partial class Form1 : MaterialForm, IAlphyHost
     {
         private string gamePath = "";
         private readonly string backupFolder = Config.BackupFolder;
@@ -34,6 +35,8 @@ namespace Alphy
         public Form1()
         {
             InitializeComponent();
+
+            LoadPlugins();
 
             string syncAppPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "AlphyMods.exe");
             bool syncAppExists = File.Exists(syncAppPath);
@@ -522,7 +525,7 @@ namespace Alphy
             }
         }
 
-        private void LogToConsole(string message, bool isError = false)
+        public void LogToConsole(string message, bool isError = false)
         {
             if (string.IsNullOrEmpty(message)) return;
 
@@ -538,6 +541,14 @@ namespace Alphy
             txtConsole.SelectionColor = isError ? Color.Salmon : Color.LightGreen;
             txtConsole.AppendText($"[{timestamp}] {message}{Environment.NewLine}");
             txtConsole.ScrollToCaret();
+        }
+
+        private void btnPlugins_Click(object sender, EventArgs e)
+        {
+            using (FormPlugins pluginsForm = new FormPlugins(this, this))
+            {
+                pluginsForm.ShowDialog();
+            }
         }
 
         private async void btnSave_Click(object sender, EventArgs e)
@@ -743,6 +754,89 @@ namespace Alphy
                     LogToConsole("System: Mod list refreshed.");
                 }
             }
+        }
+
+        private List<IAlphyPlugin> loadedPlugins = new List<IAlphyPlugin>();
+
+        public List<IAlphyPlugin> GetLoadedPlugins()
+        {
+            return loadedPlugins;
+        }
+
+        public void ReloadPlugin(string dllPath)
+        {
+            try
+            {
+                byte[] dllBytes = File.ReadAllBytes(dllPath);
+                var assembly = System.Reflection.Assembly.Load(dllBytes);
+
+                foreach (Type type in assembly.GetTypes())
+                {
+                    if (typeof(IAlphyPlugin).IsAssignableFrom(type) && !type.IsInterface && !type.IsAbstract)
+                    {
+                        IAlphyPlugin plugin = (IAlphyPlugin)Activator.CreateInstance(type);
+                        plugin.Initialize(this);
+
+                        var existing = loadedPlugins.FirstOrDefault(p => p.Name == plugin.Name);
+                        if (existing != null)
+                        {
+                            loadedPlugins.Remove(existing);
+                        }
+                        loadedPlugins.Add(plugin);
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                LogToConsole($"Plugin Error: {ex.Message}", true);
+            }
+        }
+
+        private void LoadPlugins()
+        {
+            string pluginsDir = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), @"Alphy\Plugins");
+            if (!Directory.Exists(pluginsDir)) Directory.CreateDirectory(pluginsDir);
+
+            string[] pluginFiles = Directory.GetFiles(pluginsDir, "*.dll", SearchOption.AllDirectories);
+
+            foreach (string dllPath in pluginFiles)
+            {
+                ReloadPlugin(dllPath);
+            }
+        }
+
+        public void RefreshModList()
+        {
+            if (this.InvokeRequired)
+            {
+                this.Invoke(new Action(RefreshModList));
+                return;
+            }
+
+            LogToConsole("System: Plugin requested mod list refresh...");
+            InitializeModList();
+
+            _ = Task.Run(async () =>
+            {
+                await CreateInitialBackups();
+                foreach (var mod in activeMods) { await mod.Card.LoadImageAsync(); }
+                LoadSavedModStatesBackground();
+            });
+        }
+
+        public interface IAlphyHost
+        {
+            void RefreshModList();
+            void LogToConsole(string message, bool isError = false);
+        }
+
+        public interface IAlphyPlugin
+        {
+            string Name { get; }
+            string Description { get; }
+            string Version { get; }
+            void Initialize(IAlphyHost host);
+            void ShowUI();
         }
     }
 }

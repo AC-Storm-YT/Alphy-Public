@@ -11,7 +11,7 @@ namespace Alphy
         private static string githubVersionUrl = "https://github.com/AC-Storm-YT/alphy.github.io/raw/refs/heads/main/version.txt";
         private static string githubZipUrl = "https://github.com/AC-Storm-YT/alphy.github.io/raw/refs/heads/main/alphy.zip";
 
-        public static string LocalVersion = "1.4.0";
+        public static string LocalVersion = "1.5.0";
 
         public static string GetServerVersion()
         {

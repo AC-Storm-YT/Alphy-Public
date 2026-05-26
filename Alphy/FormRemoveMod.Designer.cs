@@ -15,6 +15,7 @@
 
         private void InitializeComponent()
         {
+            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(FormRemoveMod));
             this.cmbCategory = new MaterialSkin.Controls.MaterialComboBox();
             this.panelMods = new System.Windows.Forms.FlowLayoutPanel();
             this.chkSelectAll = new MaterialSkin.Controls.MaterialCheckbox();
@@ -25,7 +26,7 @@
             // 
             // cmbCategory
             // 
-            this.cmbCategory.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left)
+            this.cmbCategory.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
             this.cmbCategory.AutoResize = false;
             this.cmbCategory.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(255)))), ((int)(((byte)(255)))), ((int)(((byte)(255)))));
@@ -34,7 +35,7 @@
             this.cmbCategory.DropDownHeight = 174;
             this.cmbCategory.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
             this.cmbCategory.DropDownWidth = 121;
-            this.cmbCategory.Font = new System.Drawing.Font("Roboto Medium", 14F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Pixel);
+            this.cmbCategory.Font = new System.Drawing.Font("Microsoft Sans Serif", 14F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Pixel);
             this.cmbCategory.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(222)))), ((int)(((byte)(0)))), ((int)(((byte)(0)))), ((int)(((byte)(0)))));
             this.cmbCategory.FormattingEnabled = true;
             this.cmbCategory.Hint = "Select Category to View Mods";
@@ -48,6 +49,20 @@
             this.cmbCategory.StartIndex = 0;
             this.cmbCategory.TabIndex = 0;
             this.cmbCategory.SelectedIndexChanged += new System.EventHandler(this.cmbCategory_SelectedIndexChanged);
+            // 
+            // panelMods
+            // 
+            this.panelMods.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.panelMods.AutoScroll = true;
+            this.panelMods.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(40)))), ((int)(((byte)(40)))), ((int)(((byte)(40)))));
+            this.panelMods.FlowDirection = System.Windows.Forms.FlowDirection.TopDown;
+            this.panelMods.Location = new System.Drawing.Point(17, 174);
+            this.panelMods.Name = "panelMods";
+            this.panelMods.Size = new System.Drawing.Size(416, 195);
+            this.panelMods.TabIndex = 2;
+            this.panelMods.WrapContents = false;
             // 
             // chkSelectAll
             // 
@@ -66,23 +81,9 @@
             this.chkSelectAll.UseVisualStyleBackColor = true;
             this.chkSelectAll.CheckedChanged += new System.EventHandler(this.chkSelectAll_CheckedChanged);
             // 
-            // panelMods
-            // 
-            this.panelMods.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom)
-            | System.Windows.Forms.AnchorStyles.Left)
-            | System.Windows.Forms.AnchorStyles.Right)));
-            this.panelMods.AutoScroll = true;
-            this.panelMods.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(40)))), ((int)(((byte)(40)))), ((int)(((byte)(40)))));
-            this.panelMods.FlowDirection = System.Windows.Forms.FlowDirection.TopDown;
-            this.panelMods.Location = new System.Drawing.Point(17, 174);
-            this.panelMods.Name = "panelMods";
-            this.panelMods.Size = new System.Drawing.Size(416, 195);
-            this.panelMods.TabIndex = 2;
-            this.panelMods.WrapContents = false;
-            // 
             // txtConsole
             // 
-            this.txtConsole.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)
+            this.txtConsole.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
             this.txtConsole.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(30)))), ((int)(((byte)(30)))), ((int)(((byte)(30)))));
             this.txtConsole.BorderStyle = System.Windows.Forms.BorderStyle.None;
@@ -103,12 +104,12 @@
             this.btnRemove.Depth = 0;
             this.btnRemove.HighEmphasis = true;
             this.btnRemove.Icon = null;
-            this.btnRemove.Location = new System.Drawing.Point(269, 497);
+            this.btnRemove.Location = new System.Drawing.Point(279, 497);
             this.btnRemove.Margin = new System.Windows.Forms.Padding(4, 6, 4, 6);
             this.btnRemove.MouseState = MaterialSkin.MouseState.HOVER;
             this.btnRemove.Name = "btnRemove";
             this.btnRemove.NoAccentTextColor = System.Drawing.Color.Empty;
-            this.btnRemove.Size = new System.Drawing.Size(164, 36);
+            this.btnRemove.Size = new System.Drawing.Size(154, 36);
             this.btnRemove.TabIndex = 4;
             this.btnRemove.Text = "REMOVE SELECTED";
             this.btnRemove.Type = MaterialSkin.Controls.MaterialButton.MaterialButtonType.Contained;
@@ -146,6 +147,7 @@
             this.Controls.Add(this.panelMods);
             this.Controls.Add(this.chkSelectAll);
             this.Controls.Add(this.cmbCategory);
+            this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
             this.MaximizeBox = false;
             this.Name = "FormRemoveMod";
             this.Sizable = false;

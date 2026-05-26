@@ -15,6 +15,7 @@
 
         private void InitializeComponent()
         {
+            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(FormAddMod));
             this.txtModName = new MaterialSkin.Controls.MaterialTextBox();
             this.txtReplaces = new MaterialSkin.Controls.MaterialTextBox();
             this.cmbCategory = new MaterialSkin.Controls.MaterialComboBox();
@@ -25,12 +26,14 @@
             // 
             // txtModName
             // 
-            this.txtModName.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left)
+            this.txtModName.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
+            this.txtModName.AnimateReadOnly = false;
             this.txtModName.BorderStyle = System.Windows.Forms.BorderStyle.None;
             this.txtModName.Depth = 0;
             this.txtModName.Font = new System.Drawing.Font("Roboto", 16F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Pixel);
             this.txtModName.Hint = "Mod Name (e.g. Titanium White Fennec)";
+            this.txtModName.LeadingIcon = null;
             this.txtModName.Location = new System.Drawing.Point(17, 78);
             this.txtModName.MaxLength = 50;
             this.txtModName.MouseState = MaterialSkin.MouseState.OUT;
@@ -39,15 +42,18 @@
             this.txtModName.Size = new System.Drawing.Size(416, 50);
             this.txtModName.TabIndex = 0;
             this.txtModName.Text = "";
+            this.txtModName.TrailingIcon = null;
             // 
             // txtReplaces
             // 
-            this.txtReplaces.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left)
+            this.txtReplaces.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
+            this.txtReplaces.AnimateReadOnly = false;
             this.txtReplaces.BorderStyle = System.Windows.Forms.BorderStyle.None;
             this.txtReplaces.Depth = 0;
             this.txtReplaces.Font = new System.Drawing.Font("Roboto", 16F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Pixel);
             this.txtReplaces.Hint = "Replaces Item (e.g. Octane)";
+            this.txtReplaces.LeadingIcon = null;
             this.txtReplaces.Location = new System.Drawing.Point(17, 140);
             this.txtReplaces.MaxLength = 50;
             this.txtReplaces.MouseState = MaterialSkin.MouseState.OUT;
@@ -56,10 +62,11 @@
             this.txtReplaces.Size = new System.Drawing.Size(416, 50);
             this.txtReplaces.TabIndex = 1;
             this.txtReplaces.Text = "";
+            this.txtReplaces.TrailingIcon = null;
             // 
             // cmbCategory
             // 
-            this.cmbCategory.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left)
+            this.cmbCategory.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
             this.cmbCategory.AutoResize = false;
             this.cmbCategory.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(255)))), ((int)(((byte)(255)))), ((int)(((byte)(255)))));
@@ -84,8 +91,8 @@
             // 
             // txtConsole
             // 
-            this.txtConsole.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom)
-            | System.Windows.Forms.AnchorStyles.Left)
+            this.txtConsole.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
             this.txtConsole.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(30)))), ((int)(((byte)(30)))), ((int)(((byte)(30)))));
             this.txtConsole.BorderStyle = System.Windows.Forms.BorderStyle.None;
@@ -97,6 +104,26 @@
             this.txtConsole.Size = new System.Drawing.Size(416, 172);
             this.txtConsole.TabIndex = 3;
             this.txtConsole.Text = "System: Ready to import mod.\n";
+            // 
+            // btnSelectMod
+            // 
+            this.btnSelectMod.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
+            this.btnSelectMod.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink;
+            this.btnSelectMod.Density = MaterialSkin.Controls.MaterialButton.MaterialButtonDensity.Default;
+            this.btnSelectMod.Depth = 0;
+            this.btnSelectMod.HighEmphasis = true;
+            this.btnSelectMod.Icon = null;
+            this.btnSelectMod.Location = new System.Drawing.Point(282, 449);
+            this.btnSelectMod.Margin = new System.Windows.Forms.Padding(4, 6, 4, 6);
+            this.btnSelectMod.MouseState = MaterialSkin.MouseState.HOVER;
+            this.btnSelectMod.Name = "btnSelectMod";
+            this.btnSelectMod.NoAccentTextColor = System.Drawing.Color.Empty;
+            this.btnSelectMod.Size = new System.Drawing.Size(151, 36);
+            this.btnSelectMod.TabIndex = 4;
+            this.btnSelectMod.Text = "SELECT MOD FILES";
+            this.btnSelectMod.Type = MaterialSkin.Controls.MaterialButton.MaterialButtonType.Outlined;
+            this.btnSelectMod.UseAccentColor = false;
+            this.btnSelectMod.Click += new System.EventHandler(this.btnSelectMod_Click);
             // 
             // btnAddMod
             // 
@@ -111,32 +138,12 @@
             this.btnAddMod.MouseState = MaterialSkin.MouseState.HOVER;
             this.btnAddMod.Name = "btnAddMod";
             this.btnAddMod.NoAccentTextColor = System.Drawing.Color.Empty;
-            this.btnAddMod.Size = new System.Drawing.Size(92, 36);
+            this.btnAddMod.Size = new System.Drawing.Size(87, 36);
             this.btnAddMod.TabIndex = 5;
             this.btnAddMod.Text = "ADD MOD";
             this.btnAddMod.Type = MaterialSkin.Controls.MaterialButton.MaterialButtonType.Contained;
             this.btnAddMod.UseAccentColor = true;
             this.btnAddMod.Click += new System.EventHandler(this.btnAddMod_Click);
-            // 
-            // btnSelectMod
-            // 
-            this.btnSelectMod.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
-            this.btnSelectMod.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink;
-            this.btnSelectMod.Density = MaterialSkin.Controls.MaterialButton.MaterialButtonDensity.Default;
-            this.btnSelectMod.Depth = 0;
-            this.btnSelectMod.HighEmphasis = true;
-            this.btnSelectMod.Icon = null;
-            this.btnSelectMod.Location = new System.Drawing.Point(269, 449);
-            this.btnSelectMod.Margin = new System.Windows.Forms.Padding(4, 6, 4, 6);
-            this.btnSelectMod.MouseState = MaterialSkin.MouseState.HOVER;
-            this.btnSelectMod.Name = "btnSelectMod";
-            this.btnSelectMod.NoAccentTextColor = System.Drawing.Color.Empty;
-            this.btnSelectMod.Size = new System.Drawing.Size(164, 36);
-            this.btnSelectMod.TabIndex = 4;
-            this.btnSelectMod.Text = "SELECT MOD FILES";
-            this.btnSelectMod.Type = MaterialSkin.Controls.MaterialButton.MaterialButtonType.Outlined;
-            this.btnSelectMod.UseAccentColor = false;
-            this.btnSelectMod.Click += new System.EventHandler(this.btnSelectMod_Click);
             // 
             // FormAddMod
             // 
@@ -149,6 +156,7 @@
             this.Controls.Add(this.cmbCategory);
             this.Controls.Add(this.txtReplaces);
             this.Controls.Add(this.txtModName);
+            this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
             this.MaximizeBox = false;
             this.Name = "FormAddMod";
             this.Sizable = false;

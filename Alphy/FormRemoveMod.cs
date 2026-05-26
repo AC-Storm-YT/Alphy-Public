@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Alphy.Properties;
+using System;
 using System.IO;
 using System.Linq;
 using System.Windows.Forms;
@@ -17,8 +18,6 @@ namespace Alphy
 
             var materialSkinManager = MaterialSkinManager.Instance;
             materialSkinManager.AddFormToManage(this);
-            materialSkinManager.Theme = MaterialSkinManager.Themes.DARK;
-            materialSkinManager.ColorScheme = new ColorScheme(Primary.BlueGrey800, Primary.BlueGrey900, Primary.BlueGrey500, Accent.LightBlue200, TextShade.WHITE);
 
             cmbCategory.Items.AddRange(new string[]
             {
@@ -104,6 +103,10 @@ namespace Alphy
             if (result != DialogResult.Yes) return;
 
             int successCount = 0;
+            string gamePath = Settings.Default.GamePath;
+            string backupFolder = Config.BackupFolder;
+            var savedSettings = Config.LoadSettings();
+            bool configChanged = false;
 
             foreach (MaterialCheckbox chk in boxesToRemove)
             {
@@ -114,9 +117,76 @@ namespace Alphy
                 {
                     if (Directory.Exists(folderPath))
                     {
+                        string[] modFiles = Directory.GetFiles(folderPath);
+                        bool wasEnabled = savedSettings.ContainsKey(modName);
+
+                        if (!string.IsNullOrEmpty(gamePath) && Directory.Exists(gamePath))
+                        {
+                            foreach (string modFile in modFiles)
+                            {
+                                string fileName = Path.GetFileName(modFile);
+                                string gameFile = Path.Combine(gamePath, fileName);
+                                string backupFile = Path.Combine(backupFolder, fileName + ".bak");
+
+                                bool isCurrentlyInjected = false;
+                                if (File.Exists(gameFile) && File.Exists(modFile))
+                                {
+                                    string gameHash = FileChecker.GetFileHash(gameFile);
+                                    string modHash = FileChecker.GetFileHash(modFile);
+
+                                    if (gameHash != "error" && gameHash != "null" && gameHash == modHash)
+                                    {
+                                        isCurrentlyInjected = true;
+                                    }
+                                }
+
+                                if (wasEnabled || isCurrentlyInjected)
+                                {
+                                    if (File.Exists(backupFile))
+                                    {
+                                        try
+                                        {
+                                            File.Copy(backupFile, gameFile, true);
+                                            Log($"Restored vanilla file: {fileName}");
+                                        }
+                                        catch
+                                        {
+                                            Log($"Warning: Could not restore {fileName}. Game might be running.");
+                                        }
+                                    }
+                                }
+                            }
+                        }
+
+                        if (wasEnabled)
+                        {
+                            savedSettings.Remove(modName);
+                            configChanged = true;
+                        }
+
                         Directory.Delete(folderPath, true);
                         Log($"Deleted: {modName}");
                         successCount++;
+
+                        foreach (string modFile in modFiles)
+                        {
+                            string fileName = Path.GetFileName(modFile);
+                            string backupFile = Path.Combine(backupFolder, fileName + ".bak");
+
+                            if (File.Exists(backupFile))
+                            {
+                                var allRemainingFiles = Directory.GetFiles(baseModsPath, fileName, SearchOption.AllDirectories);
+                                if (allRemainingFiles.Length == 0)
+                                {
+                                    try
+                                    {
+                                        File.Delete(backupFile);
+                                        Log($"Cleared unused backup: {fileName}.bak");
+                                    }
+                                    catch { }
+                                }
+                            }
+                        }
                     }
                 }
                 catch (Exception ex)
@@ -125,11 +195,15 @@ namespace Alphy
                 }
             }
 
+            if (configChanged)
+            {
+                Config.SaveSettings(savedSettings);
+            }
+
             if (successCount > 0)
             {
                 Log($"DONE: Successfully removed {successCount} mod(s).");
                 this.DialogResult = DialogResult.OK;
-
                 cmbCategory_SelectedIndexChanged(null, null);
             }
         }

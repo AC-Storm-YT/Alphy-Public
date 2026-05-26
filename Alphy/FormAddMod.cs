@@ -18,8 +18,6 @@ namespace Alphy
 
             var materialSkinManager = MaterialSkinManager.Instance;
             materialSkinManager.AddFormToManage(this);
-            materialSkinManager.Theme = MaterialSkinManager.Themes.DARK;
-            materialSkinManager.ColorScheme = new ColorScheme(Primary.BlueGrey800, Primary.BlueGrey900, Primary.BlueGrey500, Accent.LightBlue200, TextShade.WHITE);
 
             cmbCategory.Items.AddRange(new string[]
             {
@@ -38,18 +36,14 @@ namespace Alphy
         {
             using (OpenFileDialog ofd = new OpenFileDialog())
             {
-                ofd.Multiselect = true;
+                ofd.Multiselect = false;
                 ofd.Filter = "Mod Files (*.upk;*.bnk)|*.upk;*.bnk|All Files (*.*)|*.*";
-                ofd.Title = "Select Mod Files";
+                ofd.Title = "Select Mod File";
 
                 if (ofd.ShowDialog() == DialogResult.OK)
                 {
-                    selectedFilePaths = ofd.FileNames.ToList();
-                    Log($"Selected {selectedFilePaths.Count} file(s).");
-                    foreach (string file in selectedFilePaths)
-                    {
-                        Log($"- {Path.GetFileName(file)}");
-                    }
+                    selectedFilePaths = new List<string> { ofd.FileName };
+                    Log($"Selected file: {Path.GetFileName(ofd.FileName)}");
                 }
             }
         }
@@ -59,14 +53,12 @@ namespace Alphy
             if (string.IsNullOrWhiteSpace(txtModName.Text)) { Log("Error: Please enter a Mod Name."); return; }
             if (string.IsNullOrWhiteSpace(txtReplaces.Text)) { Log("Error: Please specify what item this replaces."); return; }
             if (cmbCategory.SelectedIndex == -1) { Log("Error: Please select a Category."); return; }
-            if (selectedFilePaths.Count == 0) { Log("Error: Please select at least one mod file."); return; }
+            if (selectedFilePaths.Count == 0) { Log("Error: Please select a mod file."); return; }
 
             try
             {
                 string category = cmbCategory.SelectedItem.ToString();
-
                 string folderName = $"{txtModName.Text.Trim()} (Replaces {txtReplaces.Text.Trim()})";
-
                 string baseModsPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "mods");
                 string categoryFolder = Path.Combine(baseModsPath, category);
 
@@ -78,7 +70,6 @@ namespace Alphy
                 }
 
                 string targetFolder = Path.Combine(categoryFolder, folderName);
-
                 Directory.CreateDirectory(targetFolder);
                 Log($"Created folder: {category}\\{folderName}");
 
@@ -86,7 +77,6 @@ namespace Alphy
                 {
                     string fileName = Path.GetFileName(sourceFile);
                     string destFile = Path.Combine(targetFolder, fileName);
-
                     File.Copy(sourceFile, destFile, true);
                     Log($"Imported: {fileName}");
                 }

@@ -5,6 +5,7 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Drawing;
+using System.Drawing.Drawing2D;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
@@ -17,12 +18,15 @@ namespace Alphy
         private string gamePath = "";
         private readonly string backupFolder = Config.BackupFolder;
 
+        private string currentCategory = "All";
+
         private class ModItem
         {
             public MaterialCheckbox Checkbox { get; set; }
             public string ModName { get; set; }
             public string[] Files { get; set; }
             public ModCard Card { get; set; }
+            public string Category { get; set; }
         }
 
         private List<ModItem> activeMods = new List<ModItem>();
@@ -35,18 +39,66 @@ namespace Alphy
             bool syncAppExists = File.Exists(syncAppPath);
 
             this.SetStyle(ControlStyles.OptimizedDoubleBuffer | ControlStyles.AllPaintingInWmPaint | ControlStyles.UserPaint, true);
-            typeof(Control).GetProperty("DoubleBuffered", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance)
-                ?.SetValue(tabControl1, true, null);
 
             var materialSkinManager = MaterialSkinManager.Instance;
             materialSkinManager.AddFormToManage(this);
             materialSkinManager.Theme = MaterialSkinManager.Themes.DARK;
-            materialSkinManager.ColorScheme = new ColorScheme(Primary.BlueGrey800, Primary.BlueGrey900, Primary.BlueGrey500, Accent.LightBlue200, TextShade.WHITE);
+            materialSkinManager.ColorScheme = new ColorScheme(Primary.Indigo600, Primary.Indigo700, Primary.Indigo400, Accent.Indigo200, TextShade.WHITE);
 
-            this.DrawerTabControl = tabControl1;
-            this.DrawerUseColors = true;
+            materialSkinManager.RemoveFormToManage(this);
+
+            flowLayoutPanelMods.Paint += FlowLayoutPanelMods_Paint;
+            flowLayoutPanelMods.Resize += (s, e) => flowLayoutPanelMods.Invalidate();
+            flowLayoutPanelMods.Scroll += (s, e) => flowLayoutPanelMods.Invalidate(true);
+            flowLayoutPanelMods.MouseWheel += (s, e) => flowLayoutPanelMods.Invalidate(true);
+
+            typeof(FlowLayoutPanel).InvokeMember("DoubleBuffered",
+                System.Reflection.BindingFlags.SetProperty |
+                System.Reflection.BindingFlags.Instance |
+                System.Reflection.BindingFlags.NonPublic,
+                null, flowLayoutPanelMods, new object[] { true });
 
             this.Shown += Form1_Shown;
+
+            panelSidebar.BackColorChanged += (s, e) =>
+            {
+                if (panelSidebar.BackColor != Color.FromArgb(30, 30, 30))
+                    panelSidebar.BackColor = Color.FromArgb(30, 30, 30);
+            };
+
+            panelBottom.BackColorChanged += (s, e) =>
+            {
+                if (panelBottom.BackColor != Color.FromArgb(40, 40, 40))
+                    panelBottom.BackColor = Color.FromArgb(40, 40, 40);
+            };
+
+            panelSidebar.BackColor = Color.FromArgb(30, 30, 30);
+            panelBottom.BackColor = Color.FromArgb(40, 40, 40);
+
+            SidebarCategory_Click(btnCatAll, EventArgs.Empty);
+        }
+
+        private void FlowLayoutPanelMods_Paint(object sender, PaintEventArgs e)
+        {
+            Graphics g = e.Graphics;
+
+            var state = g.Save();
+
+            g.ResetTransform();
+
+            Rectangle rect = flowLayoutPanelMods.ClientRectangle;
+
+            if (rect.Width == 0 || rect.Height == 0) return;
+
+            Color colorTopLeft = Color.FromArgb(15, 17, 30);
+            Color colorBottomRight = Color.FromArgb(35, 43, 90);
+
+            using (System.Drawing.Drawing2D.LinearGradientBrush brush = new System.Drawing.Drawing2D.LinearGradientBrush(rect, colorTopLeft, colorBottomRight, System.Drawing.Drawing2D.LinearGradientMode.ForwardDiagonal))
+            {
+                g.FillRectangle(brush, rect);
+            }
+
+            g.Restore(state);
         }
 
         private async void Form1_Shown(object sender, EventArgs e)
@@ -126,7 +178,6 @@ namespace Alphy
 
         private void InitializeModList()
         {
-            tabControl1.TabPages.Clear();
             activeMods.Clear();
 
             string modsRoot = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "mods");
@@ -145,18 +196,6 @@ namespace Alphy
                 string categoryPath = Path.Combine(modsRoot, category);
                 if (!Directory.Exists(categoryPath)) Directory.CreateDirectory(categoryPath);
 
-                TabPage newTab = new TabPage(category) { BackColor = System.Drawing.Color.FromArgb(50, 50, 50) };
-
-                FlowLayoutPanel panel = new FlowLayoutPanel
-                {
-                    Dock = DockStyle.Fill,
-                    BackColor = System.Drawing.Color.Transparent,
-                    AutoScroll = true
-                };
-
-                typeof(Control).GetProperty("DoubleBuffered", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance)
-                    ?.SetValue(panel, true, null);
-
                 var modFolders = Directory.GetDirectories(categoryPath);
 
                 foreach (string modPath in modFolders)
@@ -169,16 +208,14 @@ namespace Alphy
 
                     if (modFiles.Length > 0)
                     {
-                        AddModToPanel(panel, modName, modFiles, category);
+                        AddModToMemory(modName, modFiles, category);
                     }
                 }
-
-                newTab.Controls.Add(panel);
-                tabControl1.TabPages.Add(newTab);
             }
+            ApplyFilters();
         }
 
-        private void AddModToPanel(FlowLayoutPanel panel, string label, string[] files, string category)
+        private void AddModToMemory(string label, string[] files, string category)
         {
             string modName = label;
             string replacesName = "";
@@ -208,15 +245,61 @@ namespace Alphy
             card.Checkbox.CheckedChanged += (s, e) => {
                 if (card.Checkbox.Checked)
                 {
-                    foreach (var mod in activeMods.Where(m => (string)m.Checkbox.Tag == category && m.Checkbox != card.Checkbox))
+                    foreach (var mod in activeMods.Where(m => m.Category == category && m.Checkbox != card.Checkbox))
                     {
                         mod.Checkbox.Checked = false;
                     }
                 }
             };
 
-            activeMods.Add(new ModItem { Checkbox = card.Checkbox, ModName = label, Files = files, Card = card });
-            panel.Controls.Add(card);
+            activeMods.Add(new ModItem { Checkbox = card.Checkbox, ModName = label, Files = files, Card = card, Category = category });
+        }
+
+        private void ApplyFilters()
+        {
+            flowLayoutPanelMods.SuspendLayout();
+            flowLayoutPanelMods.Controls.Clear();
+
+            string search = txtSearch.Text.Trim().ToLower();
+
+            foreach (var mod in activeMods)
+            {
+                bool matchesCategory = currentCategory == "All" || mod.Category.ToLower() == currentCategory.ToLower();
+                bool matchesSearch = string.IsNullOrEmpty(search) || mod.ModName.ToLower().Contains(search);
+
+                if (matchesCategory && matchesSearch)
+                {
+                    flowLayoutPanelMods.Controls.Add(mod.Card);
+                }
+            }
+
+            flowLayoutPanelMods.ResumeLayout();
+        }
+
+        private void txtSearch_TextChanged(object sender, EventArgs e)
+        {
+            ApplyFilters();
+        }
+
+        private void SidebarCategory_Click(object sender, EventArgs e)
+        {
+            Button clickedBtn = sender as Button;
+            if (clickedBtn == null || clickedBtn.Tag == null) return;
+
+            foreach (Control ctrl in panelSidebar.Controls)
+            {
+                if (ctrl is Button btn)
+                {
+                    btn.BackColor = System.Drawing.Color.FromArgb(30, 30, 30);
+                    btn.ForeColor = System.Drawing.Color.DarkGray;
+                }
+            }
+
+            clickedBtn.BackColor = System.Drawing.Color.FromArgb(50, 50, 50);
+            clickedBtn.ForeColor = System.Drawing.Color.White;
+
+            currentCategory = clickedBtn.Tag.ToString();
+            ApplyFilters();
         }
 
         private void LoadSavedModStatesBackground()
@@ -302,14 +385,14 @@ namespace Alphy
 
                     if (latest != "Unknown" && latest != current)
                     {
-                        LogToConsole("CRITICAL: App update required to continue.");
+                        LogToConsole("CRITICAL: App update required to continue.", true);
                         ToggleControls(false);
                         Updater.CheckForUpdates();
                         return;
                     }
                     else if (latest == "Unknown")
                     {
-                        LogToConsole("Error: Could not verify app version. Locked for safety.");
+                        LogToConsole("Error: Could not verify app version. Locked for safety.", true);
                         ToggleControls(false);
                         return;
                     }
@@ -342,7 +425,7 @@ namespace Alphy
 
             if (isExeMismatch || isBuildMismatch)
             {
-                LogToConsole("Error: Alphy does not support this version of the game.");
+                LogToConsole("Error: Alphy does not support this version of the game.", true);
                 if (isExeMismatch)
                     LogToConsole($"Detected EXE: {localVer} | Supported EXE: {supportedVer}");
 
@@ -362,7 +445,7 @@ namespace Alphy
             }
             else if (localVer == "Not Found")
             {
-                LogToConsole("Error: Could not locate RocketLeague.exe. Verify path.");
+                LogToConsole("Error: Could not locate RocketLeague.exe. Verify path.", true);
                 ToggleControls(false);
             }
             else
@@ -439,15 +522,21 @@ namespace Alphy
             }
         }
 
-        private void LogToConsole(string text)
+        private void LogToConsole(string message, bool isError = false)
         {
+            if (string.IsNullOrEmpty(message)) return;
+
             if (txtConsole.InvokeRequired)
             {
-                txtConsole.Invoke(new Action<string>(LogToConsole), text);
+                txtConsole.Invoke(new Action(() => LogToConsole(message, isError)));
                 return;
             }
-            txtConsole.AppendText($"[{DateTime.Now:HH:mm:ss}] {text}{Environment.NewLine}");
-            txtConsole.SelectionStart = txtConsole.Text.Length;
+
+            string timestamp = DateTime.Now.ToString("HH:mm:ss");
+            txtConsole.SelectionStart = txtConsole.TextLength;
+            txtConsole.SelectionLength = 0;
+            txtConsole.SelectionColor = isError ? Color.Salmon : Color.LightGreen;
+            txtConsole.AppendText($"[{timestamp}] {message}{Environment.NewLine}");
             txtConsole.ScrollToCaret();
         }
 
@@ -469,7 +558,7 @@ namespace Alphy
 
             if (localVer != supportedVer)
             {
-                LogToConsole("Abort: Game version mismatch detected. Modding blocked.");
+                LogToConsole("Abort: Game version mismatch detected. Modding blocked.", true);
                 PerformVersionLockdown();
                 return;
             }
@@ -529,7 +618,7 @@ namespace Alphy
             if (overallSuccess)
                 LogToConsole("DONE: All modifications applied and settings secured.");
             else
-                LogToConsole("FAILED: Some files could not be replaced. Verify file permissions.");
+                LogToConsole("FAILED: Some files could not be replaced. Verify file permissions.", true);
 
             btnSave.Enabled = true;
         }
@@ -562,12 +651,12 @@ namespace Alphy
             }
             catch (IOException)
             {
-                this.Invoke((MethodInvoker)delegate { LogToConsole($"Lock Error: {fileName} is busy."); });
+                this.Invoke((MethodInvoker)delegate { LogToConsole($"Lock Error: {fileName} is busy.", true); });
                 return false;
             }
             catch (Exception ex)
             {
-                this.Invoke((MethodInvoker)delegate { LogToConsole($"Error [{fileName}]: {ex.Message}"); });
+                this.Invoke((MethodInvoker)delegate { LogToConsole($"Error [{fileName}]: {ex.Message}", true); });
                 return false;
             }
         }

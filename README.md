@@ -7,6 +7,7 @@ A comprehensive, open-source Rocket League cosmetic mod manager designed for saf
 ---
 
 ## 📋 Table of Contents
+* [Core Features & Safety Systems](#security)
 * [Core Features & Safety Systems](#features)
 * [Supported Mod Categories](#categories)
 * [Installation & First Setup](#installation)
@@ -14,6 +15,16 @@ A comprehensive, open-source Rocket League cosmetic mod manager designed for saf
 * [🧩 Plugin System & Alphy Swapper](#plugins)
 * [How It Works](#how-it-works)
 * [Community, Tools & Support](#community)
+
+---
+
+## <a id="security"></a>🛡️ Security & False Positives
+
+You might notice that Alphy triggers some warnings on VirusTotal, but **these are false positives**. 
+
+Because Alphy automates low-level file system operations to safely swap protected game files, some antivirus incorrectly assume the app is acting maliciously.
+
+**Alphy is 100% open-source as well as any plugins.** You can review every single line of code in this repository to verify exactly how it interacts with your files. If you are ever concerned, you are entirely free to compile the application yourself using Visual Studio!
 
 ---
 

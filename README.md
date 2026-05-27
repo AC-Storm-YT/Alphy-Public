@@ -78,18 +78,30 @@ Alphy strictly organizes mods to ensure single-file integrity (only one mod can 
 
 ## <a id="plugins"></a>🧩 Plugin System & Alphy Swapper
 
+# 🧩 Plugin System & Alphy Swapper
+
 Alphy now supports an extensible Plugin System! Plugins allow you to add powerful new tools directly inside the Alphy interface.
 
 ### The Plugin Manager
+
 To access the Plugin Manager, click the **"Plugins"** button located at the bottom of the right sidebar. This menu allows you to browse, download, install, and update official plugins directly from the cloud with a single click.
 
 ### Official Plugin: Alphy Swapper
-The **Alphy Swapper** is an advanced, asset swapper that allows you to generate your own custom mods by swapping internal Rocket League `.upk` files. 
+
+The **Alphy Swapper** is an advanced, asset swapper that allows you to generate your own custom mods by swapping internal Rocket League `.upk` files.
 
 Because it is a native plugin, it is fully automated:
+
 * **Zero Configuration:** It automatically pulls your game directory straight from Alphy's memory. You don't need to manually link any folders.
 * **Smart Exporting:** When you generate a swap, the plugin automatically routes the new mod directly into your Alphy `mods/` folder and categorizes it perfectly.
 * **Instant Refresh:** As soon as a swap is generated, the plugin tells Alphy to instantly refresh its interface. Your newly created mod will appear in your grid immediately—**no restarts required!**
+
+#### ⚠️ Prerequisites
+The Alphy Swapper requires **Python 3.8.0 or newer** to execute the background asset modifications. 
+
+**Crucial Installation Step:** When running the Python installer, you **must UNCHECK** the box that says **"Add Python to PATH"** at the bottom of the window, exactly as shown below:
+
+![Python Installer - Uncheck Add to PATH](https://i.imgur.com/VqKqFra.png)
 
 ---
 

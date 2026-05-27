@@ -78,8 +78,6 @@ Alphy strictly organizes mods to ensure single-file integrity (only one mod can 
 
 ## <a id="plugins"></a>🧩 Plugin System & Alphy Swapper
 
-# 🧩 Plugin System & Alphy Swapper
-
 Alphy now supports an extensible Plugin System! Plugins allow you to add powerful new tools directly inside the Alphy interface.
 
 ### The Plugin Manager

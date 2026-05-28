@@ -22,7 +22,8 @@ namespace Alphy
             cmbCategory.Items.AddRange(new string[]
             {
                 "Antenna", "Banner", "Body", "Boost", "Boost Audio",
-                "Decal", "Goal Explosion", "Hat", "Paint", "Trail", "Wheels"
+                "Decal", "Goal Explosion", "Hat", "Paint", "Trail", "Wheels", "Engine Audio",
+                "Avatar Border"
             });
         }
 

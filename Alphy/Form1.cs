@@ -192,7 +192,7 @@ namespace Alphy
                 return;
             }
 
-            string[] categories = { "Body", "Decal", "Wheels", "Boost", "Hat", "Antenna", "Trail", "Paint", "Boost Audio", "Goal Explosion", "Banner" };
+            string[] categories = { "Body", "Decal", "Wheels", "Boost", "Hat", "Antenna", "Trail", "Paint", "Boost Audio", "Goal Explosion", "Banner", "Engine Audio", "Avatar Border" };
 
             foreach (string category in categories)
             {

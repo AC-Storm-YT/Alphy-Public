@@ -25,6 +25,8 @@
             this.btnImportMod = new MaterialSkin.Controls.MaterialButton();
             this.txtConsole = new System.Windows.Forms.RichTextBox();
             this.panelSidebar = new System.Windows.Forms.Panel();
+            this.btnCatAvatarBorder = new System.Windows.Forms.Button();
+            this.btnCatEngineAudio = new System.Windows.Forms.Button();
             this.btnCatAudio = new System.Windows.Forms.Button();
             this.btnCatTopper = new System.Windows.Forms.Button();
             this.btnCatAntenna = new System.Windows.Forms.Button();
@@ -202,6 +204,8 @@
             // 
             this.panelSidebar.AutoScroll = true;
             this.panelSidebar.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(30)))), ((int)(((byte)(30)))), ((int)(((byte)(30)))));
+            this.panelSidebar.Controls.Add(this.btnCatAvatarBorder);
+            this.panelSidebar.Controls.Add(this.btnCatEngineAudio);
             this.panelSidebar.Controls.Add(this.btnCatAudio);
             this.panelSidebar.Controls.Add(this.btnCatTopper);
             this.panelSidebar.Controls.Add(this.btnCatAntenna);
@@ -219,6 +223,44 @@
             this.panelSidebar.Name = "panelSidebar";
             this.panelSidebar.Size = new System.Drawing.Size(220, 563);
             this.panelSidebar.TabIndex = 1;
+            // 
+            // btnCatEngineAudio
+            // 
+            this.btnCatEngineAudio.Dock = System.Windows.Forms.DockStyle.Top;
+            this.btnCatEngineAudio.FlatAppearance.BorderSize = 0;
+            this.btnCatEngineAudio.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.btnCatEngineAudio.Font = new System.Drawing.Font("Segoe UI Semibold", 10F, System.Drawing.FontStyle.Bold);
+            this.btnCatEngineAudio.ForeColor = System.Drawing.Color.DarkGray;
+            this.btnCatEngineAudio.ImageAlign = System.Drawing.ContentAlignment.MiddleLeft;
+            this.btnCatEngineAudio.Location = new System.Drawing.Point(0, 540);
+            this.btnCatEngineAudio.Name = "btnCatEngineAudio";
+            this.btnCatEngineAudio.Padding = new System.Windows.Forms.Padding(15, 0, 0, 0);
+            this.btnCatEngineAudio.Size = new System.Drawing.Size(220, 45);
+            this.btnCatEngineAudio.TabIndex = 12;
+            this.btnCatEngineAudio.Tag = "Engine Audio";
+            this.btnCatEngineAudio.Text = " ⚙️   Engine Audio";
+            this.btnCatEngineAudio.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
+            this.btnCatEngineAudio.UseVisualStyleBackColor = true;
+            this.btnCatEngineAudio.Click += new System.EventHandler(this.SidebarCategory_Click);
+            // 
+            // btnCatAvatarBorder
+            // 
+            this.btnCatAvatarBorder.Dock = System.Windows.Forms.DockStyle.Top;
+            this.btnCatAvatarBorder.FlatAppearance.BorderSize = 0;
+            this.btnCatAvatarBorder.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.btnCatAvatarBorder.Font = new System.Drawing.Font("Segoe UI Semibold", 10F, System.Drawing.FontStyle.Bold);
+            this.btnCatAvatarBorder.ForeColor = System.Drawing.Color.DarkGray;
+            this.btnCatAvatarBorder.ImageAlign = System.Drawing.ContentAlignment.MiddleLeft;
+            this.btnCatAvatarBorder.Location = new System.Drawing.Point(0, 585);
+            this.btnCatAvatarBorder.Name = "btnCatAvatarBorder";
+            this.btnCatAvatarBorder.Padding = new System.Windows.Forms.Padding(15, 0, 0, 0);
+            this.btnCatAvatarBorder.Size = new System.Drawing.Size(220, 45);
+            this.btnCatAvatarBorder.TabIndex = 13;
+            this.btnCatAvatarBorder.Tag = "Avatar Border";
+            this.btnCatAvatarBorder.Text = " 🖼️   Avatar Borders";
+            this.btnCatAvatarBorder.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
+            this.btnCatAvatarBorder.UseVisualStyleBackColor = true;
+            this.btnCatAvatarBorder.Click += new System.EventHandler(this.SidebarCategory_Click);
             // 
             // btnCatAudio
             // 
@@ -541,6 +583,8 @@
         private System.Windows.Forms.Button btnCatAntenna;
         private System.Windows.Forms.Button btnCatTopper;
         private System.Windows.Forms.Button btnCatAudio;
+        private System.Windows.Forms.Button btnCatEngineAudio;
+        private System.Windows.Forms.Button btnCatAvatarBorder;
         private MaterialSkin.Controls.MaterialTextBox txtSearch;
     }
 }

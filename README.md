@@ -108,9 +108,7 @@ Because it is a native plugin, it is fully automated:
 #### ⚠️ Prerequisites
 The Alphy Swapper requires **Python 3.8.0 or newer** to execute the background asset modifications. 
 
-**Crucial Installation Step:** When running the Python installer, you **must UNCHECK** the box that says **"Add Python to PATH"** at the bottom of the window, exactly as shown below:
-
-![Python Installer - Uncheck Add to PATH](https://i.imgur.com/VqKqFra.png)
+The swapper plugin should automatically install it, but if you run into an error, you will have to install it.
 
 ---
 

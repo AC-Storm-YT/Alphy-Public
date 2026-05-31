@@ -2,6 +2,7 @@
 using System.IO;
 using System.Linq;
 using System.Net;
+using System.Reflection;
 using System.Windows.Forms;
 
 namespace Alphy
@@ -11,7 +12,113 @@ namespace Alphy
         private static string githubVersionUrl = "https://github.com/AC-Storm-YT/alphy.github.io/raw/refs/heads/main/version.txt";
         private static string githubZipUrl = "https://github.com/AC-Storm-YT/alphy.github.io/raw/refs/heads/main/alphy.zip";
 
-        public static string LocalVersion = "1.6.1";
+        public static string LocalVersion = "1.7.0";
+
+        public static void EnsureBundledBackendInstalled()
+        {
+            InstallEmbeddedBackendFile(
+                "alphy_custom_texture_injector.py",
+                "Alphy.Backend.alphy_custom_texture_injector.py");
+        }
+
+        private static void InstallEmbeddedBackendFile(string fileName, string resourceName)
+        {
+            try
+            {
+                byte[] embeddedBytes = ReadEmbeddedResource(resourceName, fileName);
+                if (embeddedBytes == null || embeddedBytes.Length == 0)
+                {
+                    CopyLooseBackendFileIfNewer(fileName);
+                    return;
+                }
+
+                string destinationDir = Path.Combine(
+                    Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData),
+                    "AlphySwapper",
+                    "Backend");
+                Directory.CreateDirectory(destinationDir);
+
+                string destinationPath = Path.Combine(destinationDir, fileName);
+                if (!File.Exists(destinationPath) || !FileBytesEqual(destinationPath, embeddedBytes))
+                {
+                    File.WriteAllBytes(destinationPath, embeddedBytes);
+                    File.SetLastWriteTimeUtc(destinationPath,
+                        File.GetLastWriteTimeUtc(Assembly.GetExecutingAssembly().Location));
+                }
+            }
+            catch
+            {
+                // The local bundled backend remains available as a fallback.
+            }
+        }
+
+        private static byte[] ReadEmbeddedResource(string resourceName, string fileName)
+        {
+            Assembly assembly = Assembly.GetExecutingAssembly();
+            string resolvedName = resourceName;
+            if (assembly.GetManifestResourceInfo(resolvedName) == null)
+            {
+                resolvedName = assembly.GetManifestResourceNames()
+                    .FirstOrDefault(name => name.EndsWith("." + fileName, StringComparison.OrdinalIgnoreCase));
+            }
+
+            if (string.IsNullOrWhiteSpace(resolvedName))
+                return null;
+
+            using (Stream stream = assembly.GetManifestResourceStream(resolvedName))
+            {
+                if (stream == null)
+                    return null;
+
+                using (MemoryStream memory = new MemoryStream())
+                {
+                    stream.CopyTo(memory);
+                    return memory.ToArray();
+                }
+            }
+        }
+
+        private static bool FileBytesEqual(string path, byte[] expectedBytes)
+        {
+            byte[] currentBytes = File.ReadAllBytes(path);
+            if (currentBytes.Length != expectedBytes.Length)
+                return false;
+
+            for (int i = 0; i < currentBytes.Length; i++)
+            {
+                if (currentBytes[i] != expectedBytes[i])
+                    return false;
+            }
+
+            return true;
+        }
+
+        private static void CopyLooseBackendFileIfNewer(string fileName)
+        {
+            string sourcePath = Path.Combine(Application.StartupPath, "Backend", fileName);
+            if (!File.Exists(sourcePath))
+                return;
+
+            string destinationDir = Path.Combine(
+                Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData),
+                "AlphySwapper",
+                "Backend");
+            Directory.CreateDirectory(destinationDir);
+
+            string destinationPath = Path.Combine(destinationDir, fileName);
+            if (!File.Exists(destinationPath) || IsSourceNewer(sourcePath, destinationPath))
+            {
+                File.Copy(sourcePath, destinationPath, true);
+                File.SetLastWriteTimeUtc(destinationPath, File.GetLastWriteTimeUtc(sourcePath));
+            }
+        }
+
+        private static bool IsSourceNewer(string sourcePath, string destinationPath)
+        {
+            DateTime sourceTime = File.GetLastWriteTimeUtc(sourcePath);
+            DateTime destinationTime = File.GetLastWriteTimeUtc(destinationPath);
+            return sourceTime > destinationTime.AddMilliseconds(1);
+        }
 
         public static string GetServerVersion()
         {

@@ -1,8 +1,10 @@
 ﻿using Alphy.Properties;
 using MaterialSkin;
 using MaterialSkin.Controls;
+using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Diagnostics;
 using System.Drawing;
 using System.Drawing.Drawing2D;
@@ -192,7 +194,7 @@ namespace Alphy
                 return;
             }
 
-            string[] categories = { "Body", "Decal", "Wheels", "Boost", "Hat", "Antenna", "Trail", "Paint", "Boost Audio", "Goal Explosion", "Banner", "Engine Audio", "Avatar Border" };
+            string[] categories = { "Body", "Decal", "Wheels", "Boost", "Hat", "Antenna", "Trail", "Paint", "Boost Audio", "Goal Explosion", "Banner", "Engine Audio", "Avatar Border", "Custom Decals", "Custom Balls", "Custom Boost Meter" };
 
             foreach (string category in categories)
             {
@@ -204,10 +206,15 @@ namespace Alphy
                 foreach (string modPath in modFolders)
                 {
                     string modName = Path.GetFileName(modPath);
-                    string[] modFiles = Directory.GetFiles(modPath)
-                        .Where(f => f.EndsWith(".upk", StringComparison.OrdinalIgnoreCase) ||
-                                    f.EndsWith(".bnk", StringComparison.OrdinalIgnoreCase))
-                        .ToArray();
+                    bool customTextureCategory = IsCustomTextureCategory(category);
+                    string[] modFiles = customTextureCategory
+                        ? Directory.GetFiles(modPath)
+                            .Where(f => f.EndsWith(".alphycustom", StringComparison.OrdinalIgnoreCase))
+                            .ToArray()
+                        : Directory.GetFiles(modPath)
+                            .Where(f => f.EndsWith(".upk", StringComparison.OrdinalIgnoreCase) ||
+                                        f.EndsWith(".bnk", StringComparison.OrdinalIgnoreCase))
+                            .ToArray();
 
                     if (modFiles.Length > 0)
                     {
@@ -240,7 +247,11 @@ namespace Alphy
                 }
             }
 
-            ModCard card = new ModCard(label, category, modName, replacesName)
+            string localIconPath = IsCustomTextureCategory(category)
+                ? GetCustomTextureIconPath(files.FirstOrDefault(), category)
+                : "";
+
+            ModCard card = new ModCard(label, category, modName, replacesName, localIconPath)
             {
                 Margin = new Padding(10, 5, 0, 0)
             };
@@ -256,6 +267,84 @@ namespace Alphy
             };
 
             activeMods.Add(new ModItem { Checkbox = card.Checkbox, ModName = label, Files = files, Card = card, Category = category });
+        }
+
+        private string GetCustomTextureIconPath(string manifestPath, string category)
+        {
+            if (string.IsNullOrWhiteSpace(manifestPath) || !File.Exists(manifestPath))
+                return "";
+
+            string modFolder = Path.GetDirectoryName(manifestPath);
+            string iconPath = Path.Combine(modFolder, "icon.png");
+            if (IsSupportedIconImage(iconPath))
+                return iconPath;
+
+            try
+            {
+                JObject manifest = JObject.Parse(File.ReadAllText(manifestPath));
+                if (category == "Custom Decals")
+                {
+                    JArray targets = manifest["decalTargets"] as JArray;
+                    if (targets != null)
+                    {
+                        foreach (JObject target in targets.OfType<JObject>())
+                        {
+                            string targetIcon = ResolveCustomIconImage(modFolder, target["diffusePath"]?.ToString());
+                            if (!string.IsNullOrWhiteSpace(targetIcon)) return targetIcon;
+
+                            targetIcon = ResolveCustomIconImage(modFolder, target["skinPath"]?.ToString());
+                            if (!string.IsNullOrWhiteSpace(targetIcon)) return targetIcon;
+
+                            targetIcon = ResolveCustomIconImage(modFolder, target["skinPackageTexturePath"]?.ToString());
+                            if (!string.IsNullOrWhiteSpace(targetIcon)) return targetIcon;
+                        }
+                    }
+
+                    string found = ResolveCustomIconImage(modFolder, manifest["diffusePath"]?.ToString());
+                    if (!string.IsNullOrWhiteSpace(found)) return found;
+
+                    found = ResolveCustomIconImage(modFolder, manifest["skinPath"]?.ToString());
+                    if (!string.IsNullOrWhiteSpace(found)) return found;
+
+                    found = ResolveCustomIconImage(modFolder, manifest["skinPackageTexturePath"]?.ToString());
+                    if (!string.IsNullOrWhiteSpace(found)) return found;
+                }
+                else if (category == "Custom Balls")
+                {
+                    string found = ResolveCustomIconImage(modFolder, manifest["diffusePath"]?.ToString());
+                    if (!string.IsNullOrWhiteSpace(found)) return found;
+                }
+                else if (category == "Custom Boost Meter")
+                {
+                    JObject textures = manifest["textures"] as JObject;
+                    foreach (string key in new[] { "Fill", "Background", "Tintable", "Glow" })
+                    {
+                        string found = ResolveCustomIconImage(modFolder, textures?[key]?.ToString());
+                        if (!string.IsNullOrWhiteSpace(found)) return found;
+                    }
+                }
+            }
+            catch
+            {
+            }
+
+            return Directory.GetFiles(modFolder, "*.*", SearchOption.AllDirectories)
+                .FirstOrDefault(IsSupportedIconImage) ?? "";
+        }
+
+        private string ResolveCustomIconImage(string modFolder, string value)
+        {
+            string path = ResolveManifestPath(modFolder, value);
+            return IsSupportedIconImage(path) ? path : "";
+        }
+
+        private static bool IsSupportedIconImage(string path)
+        {
+            if (string.IsNullOrWhiteSpace(path) || !File.Exists(path))
+                return false;
+
+            string ext = Path.GetExtension(path).ToLowerInvariant();
+            return ext == ".png" || ext == ".jpg" || ext == ".jpeg" || ext == ".bmp" || ext == ".gif";
         }
 
         private void ApplyFilters()
@@ -315,6 +404,22 @@ namespace Alphy
 
                 if (savedModData.ContainsKey(modName))
                 {
+                    if (IsCustomTextureCategory(mod.Category))
+                    {
+                        string manifestPath = mod.Files.FirstOrDefault();
+                        string manifestHash = FileChecker.GetFileHash(manifestPath);
+                        if (savedModData[modName] == manifestHash || savedModData[modName] == "custom")
+                        {
+                            this.Invoke((MethodInvoker)delegate { mod.Checkbox.Checked = true; });
+                        }
+                        else
+                        {
+                            this.Invoke((MethodInvoker)delegate { mod.Checkbox.Checked = false; });
+                            LogToConsole($"Notice: {modName} state reset (Manifest mismatch).");
+                        }
+                        continue;
+                    }
+
                     if (string.IsNullOrEmpty(gamePath))
                     {
                         this.Invoke((MethodInvoker)delegate { mod.Checkbox.Checked = true; });
@@ -586,18 +691,32 @@ namespace Alphy
 
             var modHashesToSave = new Dictionary<string, string>();
             bool overallSuccess = true;
+            var savedModData = Config.LoadSettings();
 
             var modStates = activeMods.Select(m => new
             {
                 ModName = m.ModName,
                 Files = m.Files,
-                IsChecked = m.Checkbox.Checked
+                Category = m.Category,
+                IsChecked = m.Checkbox.Checked,
+                WasSavedActive = savedModData.ContainsKey(m.ModName),
+                SavedHash = savedModData.ContainsKey(m.ModName) ? savedModData[m.ModName] : ""
             }).ToList();
 
             await Task.Run(() =>
             {
                 foreach (var mod in modStates.Where(m => !m.IsChecked))
                 {
+                    if (!mod.WasSavedActive)
+                        continue;
+
+                    if (IsCustomTextureCategory(mod.Category))
+                    {
+                        if (!HandleCustomTextureMod(mod.ModName, mod.Files.FirstOrDefault(), false, mod.Category))
+                            overallSuccess = false;
+                        continue;
+                    }
+
                     foreach (string file in mod.Files)
                     {
                         HandleFileOperation(file, false);
@@ -605,13 +724,51 @@ namespace Alphy
                 }
                 foreach (var mod in modStates.Where(m => m.IsChecked))
                 {
+                    if (IsCustomTextureCategory(mod.Category))
+                    {
+                        string manifestPath = mod.Files.FirstOrDefault();
+                        string manifestHash = FileChecker.GetFileHash(manifestPath);
+                        bool customModUnchanged = mod.WasSavedActive &&
+                            (string.Equals(mod.SavedHash, manifestHash, StringComparison.OrdinalIgnoreCase) ||
+                             string.Equals(mod.SavedHash, "custom", StringComparison.OrdinalIgnoreCase));
+
+                        if (customModUnchanged && manifestHash != "error" && manifestHash != "null")
+                        {
+                            modHashesToSave[mod.ModName] = manifestHash;
+                            continue;
+                        }
+
+                        if (!HandleCustomTextureMod(mod.ModName, mod.Files.FirstOrDefault(), true, mod.Category))
+                        {
+                            overallSuccess = false;
+                            continue;
+                        }
+
+                        if (manifestHash != "error" && manifestHash != "null")
+                        {
+                            modHashesToSave[mod.ModName] = manifestHash;
+                        }
+                        continue;
+                    }
+
+                    if (mod.WasSavedActive && IsStandardModStillInstalled(mod.Files, mod.SavedHash))
+                    {
+                        modHashesToSave[mod.ModName] = mod.SavedHash;
+                        continue;
+                    }
+
+                    bool installed = true;
                     foreach (string file in mod.Files)
                     {
                         if (!HandleFileOperation(file, true))
                         {
                             overallSuccess = false;
+                            installed = false;
                         }
                     }
+
+                    if (!installed)
+                        continue;
 
                     string fileName = Path.GetFileName(mod.Files[0]);
                     string installedFilePath = Path.Combine(gamePath, fileName);
@@ -632,6 +789,500 @@ namespace Alphy
                 LogToConsole("FAILED: Some files could not be replaced. Verify file permissions.", true);
 
             btnSave.Enabled = true;
+        }
+
+        private static bool IsCustomTextureCategory(string category)
+        {
+            return category == "Custom Decals" ||
+                   category == "Custom Balls" ||
+                   category == "Custom Boost Meter";
+        }
+
+        private bool IsStandardModStillInstalled(string[] modFiles, string savedHash)
+        {
+            if (modFiles == null || modFiles.Length == 0 || string.IsNullOrWhiteSpace(savedHash))
+                return false;
+
+            string firstFile = modFiles[0];
+            if (string.IsNullOrWhiteSpace(firstFile) || !File.Exists(firstFile))
+                return false;
+
+            string sourceHash = FileChecker.GetFileHash(firstFile);
+            if (sourceHash == "error" || sourceHash == "null" ||
+                !string.Equals(sourceHash, savedHash, StringComparison.OrdinalIgnoreCase))
+            {
+                return false;
+            }
+
+            string installedFilePath = Path.Combine(gamePath, Path.GetFileName(firstFile));
+            string installedHash = FileChecker.GetFileHash(installedFilePath);
+            return installedHash != "error" &&
+                   installedHash != "null" &&
+                   string.Equals(installedHash, savedHash, StringComparison.OrdinalIgnoreCase);
+        }
+
+        private bool HandleCustomTextureMod(string modName, string manifestPath, bool isInstall, string category)
+        {
+            if (string.IsNullOrWhiteSpace(manifestPath) || !File.Exists(manifestPath))
+            {
+                this.Invoke((MethodInvoker)delegate { LogToConsole($"Custom mod manifest missing: {modName}", true); });
+                return false;
+            }
+
+            string backupDir = GetCustomTextureBackupDir(manifestPath, category);
+            if (!isInstall && !Directory.Exists(backupDir))
+            {
+                return true;
+            }
+
+            string scriptPath = GetBackendFile("alphy_custom_texture_injector.py");
+            if (string.IsNullOrWhiteSpace(scriptPath) || !File.Exists(scriptPath))
+            {
+                this.Invoke((MethodInvoker)delegate { LogToConsole("Custom texture backend missing: alphy_custom_texture_injector.py", true); });
+                return false;
+            }
+
+            try
+            {
+                JObject config = BuildCustomTextureConfig(manifestPath, category, isInstall, backupDir);
+                string configDir = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "Alphy", "CustomTextureConfigs");
+                Directory.CreateDirectory(configDir);
+                string configPath = Path.Combine(configDir, SafePathSegment(modName) + (isInstall ? "_apply.json" : "_restore.json"));
+                File.WriteAllText(configPath, config.ToString());
+
+                this.Invoke((MethodInvoker)delegate
+                {
+                    if (isInstall)
+                    {
+                        LogToConsole($"Custom texture apply: {modName}");
+                        LogToConsole("Please, wait while we apply your mods...");
+                    }
+                    else
+                    {
+                        LogToConsole($"Custom texture restore: {modName}");
+                    }
+                });
+
+                return RunPythonBackend(scriptPath, $"--config \"{configPath}\"");
+            }
+            catch (Exception ex)
+            {
+                this.Invoke((MethodInvoker)delegate { LogToConsole($"Custom texture error [{modName}]: {ex.Message}", true); });
+                return false;
+            }
+        }
+
+        private JObject BuildCustomTextureConfig(string manifestPath, string category, bool isInstall, string backupDir)
+        {
+            JObject manifest = JObject.Parse(File.ReadAllText(manifestPath));
+            string modFolder = Path.GetDirectoryName(manifestPath);
+            string workDir = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "Alphy", "CustomTextureWork");
+
+            JObject config = new JObject
+            {
+                ["action"] = CustomTextureAction(category, isInstall),
+                ["cookedDir"] = gamePath,
+                ["backupDir"] = backupDir,
+                ["workDir"] = workDir
+            };
+
+            string keysPath = GetBackendFile("keys.txt");
+            if (!string.IsNullOrWhiteSpace(keysPath)) config["keysPath"] = keysPath;
+
+            string texconvPath = GetBackendFile("texconv.exe");
+            if (!string.IsNullOrWhiteSpace(texconvPath)) config["texconvPath"] = texconvPath;
+
+            string itemsPath = GetBackendFile("items.json");
+            if (!string.IsNullOrWhiteSpace(itemsPath) && File.Exists(itemsPath)) config["itemsPath"] = itemsPath;
+
+            if (!isInstall)
+                return config;
+
+            if (category == "Custom Decals")
+            {
+                JArray manifestTargets = manifest["decalTargets"] as JArray;
+                if (manifestTargets != null && manifestTargets.Count > 0)
+                {
+                    JArray resolvedTargets = new JArray();
+                    foreach (JObject target in manifestTargets.OfType<JObject>())
+                    {
+                        resolvedTargets.Add(BuildResolvedDecalTarget(modFolder, target));
+                    }
+                    config["decalTargets"] = resolvedTargets;
+                    config["carBody"] = manifest["replaces"]?.ToString() ?? "";
+                }
+                else
+                {
+                    JObject target = BuildResolvedDecalTarget(modFolder, manifest);
+                    foreach (JProperty prop in target.Properties())
+                    {
+                        config[prop.Name] = prop.Value.DeepClone();
+                    }
+                }
+            }
+            else if (category == "Custom Balls")
+            {
+                config["diffusePath"] = ResolveManifestPath(modFolder, manifest["diffusePath"]?.ToString());
+            }
+            else if (category == "Custom Boost Meter")
+            {
+                JObject textures = new JObject();
+                JObject manifestTextures = manifest["textures"] as JObject ?? new JObject();
+                foreach (JProperty prop in manifestTextures.Properties())
+                {
+                    textures[prop.Name] = ResolveManifestPath(modFolder, prop.Value?.ToString());
+                }
+                if (string.IsNullOrWhiteSpace(textures["Tintable"]?.ToString()) &&
+                    !string.IsNullOrWhiteSpace(textures["Fill"]?.ToString()))
+                {
+                    textures["Tintable"] = textures["Fill"];
+                }
+                config["textures"] = textures;
+            }
+
+            return config;
+        }
+
+        private JObject BuildResolvedDecalTarget(string modFolder, JObject manifest)
+        {
+            JObject target = new JObject
+            {
+                ["bodyId"] = manifest["bodyId"] ?? 23,
+                ["skinId"] = manifest["skinId"] ?? 0,
+                ["carBody"] = manifest["carBody"]?.ToString() ?? ""
+            };
+
+            string sourcePack = manifest["sourcePack"]?.ToString();
+            int bodyId = ParseManifestInt(manifest["bodyId"], 23);
+            int skinId = ParseManifestInt(manifest["skinId"], 0);
+            if (bodyId == -1 && target["carBody"]?.ToString().StartsWith("Body ID", StringComparison.OrdinalIgnoreCase) == true)
+                target["carBody"] = "Universal Decal";
+            string diffusePath = ResolveManifestPath(modFolder, manifest["diffusePath"]?.ToString());
+            string skinPath = ResolveManifestPath(modFolder, manifest["skinPath"]?.ToString());
+            string maskPath = ResolveManifestPath(modFolder, manifest["maskPath"]?.ToString());
+            string skinPackageTexturePath = ResolveManifestPath(modFolder, manifest["skinPackageTexturePath"]?.ToString());
+            string trimSheetPath = ResolveManifestPath(modFolder, manifest["trimSheetPath"]?.ToString());
+            if (string.IsNullOrWhiteSpace(maskPath))
+            {
+                maskPath = InferAlphaConsoleTexturePath(modFolder, sourcePack,
+                    "2_Diffuse_Skin_Mask", "Diffuse_Skin_Mask", "Skin_Mask", "Mask");
+            }
+            if (string.IsNullOrWhiteSpace(trimSheetPath))
+            {
+                trimSheetPath = InferAlphaConsoleTexturePath(modFolder, sourcePack,
+                    "TrimSheet", "Trim_Sheet", "Trim", "Logo");
+            }
+            if (string.IsNullOrWhiteSpace(skinPackageTexturePath))
+                skinPackageTexturePath = InferAlphaConsoleSkinOnlyTexturePath(modFolder, sourcePack);
+
+            if (bodyId == -1 && skinId > 0)
+            {
+                if (string.IsNullOrWhiteSpace(skinPackageTexturePath))
+                    skinPackageTexturePath = !string.IsNullOrWhiteSpace(skinPath) ? skinPath : diffusePath;
+                diffusePath = "";
+                skinPath = "";
+                maskPath = "";
+            }
+
+            if (!string.IsNullOrWhiteSpace(skinPackageTexturePath) && string.IsNullOrWhiteSpace(maskPath))
+            {
+                diffusePath = "";
+                skinPath = "";
+            }
+            if (string.IsNullOrWhiteSpace(diffusePath) && !string.IsNullOrWhiteSpace(skinPath))
+                diffusePath = skinPath;
+
+            target["diffusePath"] = diffusePath;
+            target["skinPath"] = skinPath;
+            target["maskPath"] = maskPath;
+            target["skinPackageTexturePath"] = skinPackageTexturePath;
+            target["trimSheetPath"] = trimSheetPath;
+            target["chassisDiffusePath"] = ResolveManifestPath(modFolder, manifest["chassisDiffusePath"]?.ToString());
+            return target;
+        }
+
+        private static int ParseManifestInt(JToken token, int fallback)
+        {
+            if (token == null) return fallback;
+            return int.TryParse(token.ToString(), out int parsed) ? parsed : fallback;
+        }
+
+        private string InferAlphaConsoleSkinOnlyTexturePath(string modFolder, string sourcePack)
+        {
+            if (!Directory.Exists(modFolder)) return "";
+
+            foreach (string jsonFile in Directory.GetFiles(modFolder, "*.json", SearchOption.AllDirectories))
+            {
+                JObject root;
+                try
+                {
+                    root = JObject.Parse(File.ReadAllText(jsonFile));
+                }
+                catch
+                {
+                    continue;
+                }
+
+                string jsonDir = Path.GetDirectoryName(jsonFile);
+                foreach (JObject entry in AlphaConsoleEntries(root, sourcePack))
+                {
+                    JObject body = entry["Body"] as JObject ?? entry;
+                    string skin = ResolveAlphaConsoleTexturePath(modFolder, jsonDir, body, "Skin");
+                    if (string.IsNullOrWhiteSpace(skin))
+                        continue;
+
+                    bool hasOtherBodyTexture =
+                        !string.IsNullOrWhiteSpace(ValueForKey(body, "Diffuse", "Body_D", "D",
+                            "1_Diffuse_Skin", "Diffuse_Skin",
+                            "2_Diffuse_Skin_Mask", "Diffuse_Skin_Mask", "Skin_Mask", "Mask"));
+                    if (!hasOtherBodyTexture)
+                        return skin;
+                }
+            }
+
+            return "";
+        }
+
+        private string InferAlphaConsoleTexturePath(string modFolder, string sourcePack, params string[] keys)
+        {
+            if (!Directory.Exists(modFolder)) return "";
+
+            foreach (string jsonFile in Directory.GetFiles(modFolder, "*.json", SearchOption.AllDirectories))
+            {
+                JObject root;
+                try
+                {
+                    root = JObject.Parse(File.ReadAllText(jsonFile));
+                }
+                catch
+                {
+                    continue;
+                }
+
+                string jsonDir = Path.GetDirectoryName(jsonFile);
+                foreach (JObject entry in AlphaConsoleEntries(root, sourcePack))
+                {
+                    JObject body = entry["Body"] as JObject ?? entry;
+                    string resolved = ResolveAlphaConsoleTexturePath(modFolder, jsonDir, body, keys);
+                    if (!string.IsNullOrWhiteSpace(resolved))
+                        return resolved;
+                }
+            }
+
+            return "";
+        }
+
+        private IEnumerable<JObject> AlphaConsoleEntries(JObject root, string sourcePack)
+        {
+            if (root == null) yield break;
+
+            if (!string.IsNullOrWhiteSpace(sourcePack) && root[sourcePack] is JObject namedEntry)
+            {
+                yield return namedEntry;
+                yield break;
+            }
+
+            if (root["Body"] is JObject)
+            {
+                yield return root;
+                yield break;
+            }
+
+            foreach (JProperty prop in root.Properties())
+            {
+                if (prop.Value is JObject obj)
+                    yield return obj;
+            }
+        }
+
+        private string ResolveAlphaConsoleTexturePath(string modFolder, string jsonDir, JObject map, params string[] keys)
+        {
+            foreach (string key in keys)
+            {
+                string value = ValueForKey(map, key);
+                string resolved = ResolveAlphaConsoleTextureValue(modFolder, jsonDir, value);
+                if (!string.IsNullOrWhiteSpace(resolved))
+                    return resolved;
+            }
+            return "";
+        }
+
+        private string ResolveAlphaConsoleTextureValue(string modFolder, string jsonDir, string value)
+        {
+            if (string.IsNullOrWhiteSpace(value)) return "";
+
+            string normalized = value.Replace('/', Path.DirectorySeparatorChar);
+            string candidate = Path.Combine(jsonDir ?? modFolder, normalized);
+            if (File.Exists(candidate))
+                return candidate;
+
+            candidate = Path.Combine(modFolder, normalized);
+            if (File.Exists(candidate))
+                return candidate;
+
+            string fileName = Path.GetFileName(normalized);
+            if (string.IsNullOrWhiteSpace(fileName)) return "";
+
+            string found = Directory.GetFiles(modFolder, fileName, SearchOption.AllDirectories).FirstOrDefault();
+            return found ?? "";
+        }
+
+        private static string ValueForKey(JObject obj, params string[] names)
+        {
+            if (obj == null) return "";
+            foreach (string name in names)
+            {
+                JToken token = obj[name];
+                if (token != null && token.Type != JTokenType.Object && token.Type != JTokenType.Array)
+                    return token.ToString();
+            }
+            return "";
+        }
+
+        private string CustomTextureAction(string category, bool isInstall)
+        {
+            if (category == "Custom Decals") return isInstall ? "apply" : "restore";
+            if (category == "Custom Balls") return isInstall ? "apply_ball" : "restore_ball";
+            if (category == "Custom Boost Meter") return isInstall ? "apply_boost_meter" : "restore_boost_meter";
+            throw new InvalidOperationException($"Unsupported custom texture category: {category}");
+        }
+
+        private string ResolveManifestPath(string modFolder, string value)
+        {
+            if (string.IsNullOrWhiteSpace(value)) return "";
+            return Path.IsPathRooted(value) ? value : Path.Combine(modFolder, value);
+        }
+
+        private string GetCustomTextureBackupDir(string manifestPath, string category)
+        {
+            string modFolderName = Path.GetFileName(Path.GetDirectoryName(manifestPath));
+            return Path.Combine(backupFolder, "CustomTextures", SafePathSegment(category), SafePathSegment(modFolderName));
+        }
+
+        private string GetBackendFile(string fileName)
+        {
+            string appDataPath = Path.Combine(
+                Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData),
+                "AlphySwapper",
+                "Backend",
+                fileName);
+            if (File.Exists(appDataPath)) return appDataPath;
+
+            string localPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Backend", fileName);
+            return File.Exists(localPath) ? localPath : appDataPath;
+        }
+
+        private bool RunPythonBackend(string scriptPath, string arguments)
+        {
+            var attempts = new[]
+            {
+                new { FileName = "python", Prefix = "" },
+                new { FileName = "py", Prefix = "-3 " },
+                new { FileName = "python3", Prefix = "" }
+            };
+
+            Exception launchError = null;
+            foreach (var attempt in attempts)
+            {
+                ProcessStartInfo psi = new ProcessStartInfo
+                {
+                    FileName = attempt.FileName,
+                    Arguments = $"{attempt.Prefix}\"{scriptPath}\" {arguments}",
+                    RedirectStandardOutput = true,
+                    RedirectStandardError = true,
+                    UseShellExecute = false,
+                    CreateNoWindow = true
+                };
+
+                try
+                {
+                    using (Process process = new Process { StartInfo = psi })
+                    {
+                        process.OutputDataReceived += (sender, args) =>
+                        {
+                            if (!ShouldSuppressPythonBackendLog(args.Data))
+                            {
+                                string line = FormatPythonBackendLog(args.Data);
+                                this.Invoke((MethodInvoker)delegate { LogToConsole(line); });
+                            }
+                        };
+                        process.ErrorDataReceived += (sender, args) =>
+                        {
+                            if (!ShouldSuppressPythonBackendLog(args.Data))
+                            {
+                                string line = FormatPythonBackendLog(args.Data);
+                                this.Invoke((MethodInvoker)delegate { LogToConsole(line, true); });
+                            }
+                        };
+
+                        process.Start();
+                        process.BeginOutputReadLine();
+                        process.BeginErrorReadLine();
+                        process.WaitForExit();
+
+                        if (process.ExitCode != 0)
+                        {
+                            this.Invoke((MethodInvoker)delegate
+                            {
+                                LogToConsole($"Custom texture backend exited with code {process.ExitCode}.", true);
+                            });
+                            return false;
+                        }
+                        return true;
+                    }
+                }
+                catch (Win32Exception ex)
+                {
+                    launchError = ex;
+                }
+            }
+
+            this.Invoke((MethodInvoker)delegate
+            {
+                LogToConsole($"Could not launch Python. Install Python or add it to PATH. {launchError?.Message}", true);
+            });
+            return false;
+        }
+
+        private static bool ShouldSuppressPythonBackendLog(string line)
+        {
+            if (string.IsNullOrWhiteSpace(line)) return true;
+
+            string trimmed = line.Trim();
+            return (line.IndexOf("cryptography", StringComparison.OrdinalIgnoreCase) >= 0 &&
+                    line.IndexOf("32-bit Python", StringComparison.OrdinalIgnoreCase) >= 0) ||
+                   trimmed.Equals("from cryptography.hazmat.bindings.openssl import binding",
+                       StringComparison.OrdinalIgnoreCase);
+        }
+
+        private static string FormatPythonBackendLog(string line)
+        {
+            if (string.IsNullOrWhiteSpace(line)) return "";
+
+            string trimmed = line.Trim();
+            if (trimmed.StartsWith("{") && trimmed.EndsWith("}"))
+            {
+                try
+                {
+                    JObject payload = JObject.Parse(trimmed);
+                    string message = payload["message"]?.ToString();
+                    if (!string.IsNullOrWhiteSpace(message))
+                        return message;
+                }
+                catch
+                {
+                }
+            }
+
+            return line;
+        }
+
+        private static string SafePathSegment(string text)
+        {
+            if (string.IsNullOrWhiteSpace(text)) return "CustomMod";
+            foreach (char c in Path.GetInvalidFileNameChars())
+                text = text.Replace(c, '_');
+            return text.Trim();
         }
 
         private bool HandleFileOperation(string modFilePath, bool isInstall)
@@ -674,7 +1325,11 @@ namespace Alphy
 
         private async Task CreateInitialBackups()
         {
-            var filesToBackup = activeMods.SelectMany(m => m.Files).Distinct().ToList();
+            var filesToBackup = activeMods
+                .Where(m => !IsCustomTextureCategory(m.Category))
+                .SelectMany(m => m.Files)
+                .Distinct()
+                .ToList();
 
             if (filesToBackup.Count == 0) return;
 

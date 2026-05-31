@@ -16,6 +16,7 @@ namespace Alphy
         {
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);
+            Updater.EnsureBundledBackendInstalled();
             Application.Run(new Form1());
         }
     }

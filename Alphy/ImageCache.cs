@@ -66,6 +66,17 @@ namespace Alphy
             });
         }
 
+        public static async Task<Image> GetLocalImageAsync(string path)
+        {
+            return await Task.Run(() =>
+            {
+                if (string.IsNullOrWhiteSpace(path) || !File.Exists(path))
+                    return null;
+
+                return LoadImageSafely(path);
+            });
+        }
+
         private static Image GetErrorImage()
         {
             string errorFolder = Path.Combine(CacheRoot, "error");

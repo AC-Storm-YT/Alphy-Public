@@ -13,14 +13,16 @@ namespace Alphy
         private string _category;
         private string _modName;
         private string _replacesName;
+        private string _localImagePath;
 
-        public ModCard(string label, string category, string modName, string replacesName)
+        public ModCard(string label, string category, string modName, string replacesName, string localImagePath = "")
         {
             InitializeComponent();
 
             _category = category;
             _modName = modName;
             _replacesName = replacesName;
+            _localImagePath = localImagePath;
 
             chkSelect.Tag = category;
 
@@ -35,7 +37,13 @@ namespace Alphy
 
         public async Task LoadImageAsync()
         {
-            Image img = await ImageCache.GetModImageAsync(_category, _modName, _replacesName);
+            Image img = null;
+            if (!string.IsNullOrWhiteSpace(_localImagePath))
+                img = await ImageCache.GetLocalImageAsync(_localImagePath);
+
+            if (img == null)
+                img = await ImageCache.GetModImageAsync(_category, _modName, _replacesName);
+
             if (img != null)
             {
                 picItem.Image = img;

@@ -25,6 +25,9 @@
             this.btnImportMod = new MaterialSkin.Controls.MaterialButton();
             this.txtConsole = new System.Windows.Forms.RichTextBox();
             this.panelSidebar = new System.Windows.Forms.Panel();
+            this.btnCatCustomBoostMeter = new System.Windows.Forms.Button();
+            this.btnCatCustomBalls = new System.Windows.Forms.Button();
+            this.btnCatCustomDecals = new System.Windows.Forms.Button();
             this.btnCatAvatarBorder = new System.Windows.Forms.Button();
             this.btnCatEngineAudio = new System.Windows.Forms.Button();
             this.btnCatAudio = new System.Windows.Forms.Button();
@@ -204,6 +207,9 @@
             // 
             this.panelSidebar.AutoScroll = true;
             this.panelSidebar.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(30)))), ((int)(((byte)(30)))), ((int)(((byte)(30)))));
+            this.panelSidebar.Controls.Add(this.btnCatCustomBoostMeter);
+            this.panelSidebar.Controls.Add(this.btnCatCustomBalls);
+            this.panelSidebar.Controls.Add(this.btnCatCustomDecals);
             this.panelSidebar.Controls.Add(this.btnCatAvatarBorder);
             this.panelSidebar.Controls.Add(this.btnCatEngineAudio);
             this.panelSidebar.Controls.Add(this.btnCatAudio);
@@ -223,6 +229,63 @@
             this.panelSidebar.Name = "panelSidebar";
             this.panelSidebar.Size = new System.Drawing.Size(220, 563);
             this.panelSidebar.TabIndex = 1;
+            // 
+            // btnCatCustomBoostMeter
+            // 
+            this.btnCatCustomBoostMeter.Dock = System.Windows.Forms.DockStyle.Top;
+            this.btnCatCustomBoostMeter.FlatAppearance.BorderSize = 0;
+            this.btnCatCustomBoostMeter.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.btnCatCustomBoostMeter.Font = new System.Drawing.Font("Segoe UI Semibold", 10F, System.Drawing.FontStyle.Bold);
+            this.btnCatCustomBoostMeter.ForeColor = System.Drawing.Color.DarkGray;
+            this.btnCatCustomBoostMeter.ImageAlign = System.Drawing.ContentAlignment.MiddleLeft;
+            this.btnCatCustomBoostMeter.Location = new System.Drawing.Point(0, 720);
+            this.btnCatCustomBoostMeter.Name = "btnCatCustomBoostMeter";
+            this.btnCatCustomBoostMeter.Padding = new System.Windows.Forms.Padding(15, 0, 0, 0);
+            this.btnCatCustomBoostMeter.Size = new System.Drawing.Size(220, 45);
+            this.btnCatCustomBoostMeter.TabIndex = 16;
+            this.btnCatCustomBoostMeter.Tag = "Custom Boost Meter";
+            this.btnCatCustomBoostMeter.Text = " 🚀   Custom Boost Meter";
+            this.btnCatCustomBoostMeter.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
+            this.btnCatCustomBoostMeter.UseVisualStyleBackColor = true;
+            this.btnCatCustomBoostMeter.Click += new System.EventHandler(this.SidebarCategory_Click);
+            // 
+            // btnCatCustomBalls
+            // 
+            this.btnCatCustomBalls.Dock = System.Windows.Forms.DockStyle.Top;
+            this.btnCatCustomBalls.FlatAppearance.BorderSize = 0;
+            this.btnCatCustomBalls.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.btnCatCustomBalls.Font = new System.Drawing.Font("Segoe UI Semibold", 10F, System.Drawing.FontStyle.Bold);
+            this.btnCatCustomBalls.ForeColor = System.Drawing.Color.DarkGray;
+            this.btnCatCustomBalls.ImageAlign = System.Drawing.ContentAlignment.MiddleLeft;
+            this.btnCatCustomBalls.Location = new System.Drawing.Point(0, 675);
+            this.btnCatCustomBalls.Name = "btnCatCustomBalls";
+            this.btnCatCustomBalls.Padding = new System.Windows.Forms.Padding(15, 0, 0, 0);
+            this.btnCatCustomBalls.Size = new System.Drawing.Size(220, 45);
+            this.btnCatCustomBalls.TabIndex = 15;
+            this.btnCatCustomBalls.Tag = "Custom Balls";
+            this.btnCatCustomBalls.Text = " ⚽   Custom Balls";
+            this.btnCatCustomBalls.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
+            this.btnCatCustomBalls.UseVisualStyleBackColor = true;
+            this.btnCatCustomBalls.Click += new System.EventHandler(this.SidebarCategory_Click);
+            // 
+            // btnCatCustomDecals
+            // 
+            this.btnCatCustomDecals.Dock = System.Windows.Forms.DockStyle.Top;
+            this.btnCatCustomDecals.FlatAppearance.BorderSize = 0;
+            this.btnCatCustomDecals.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.btnCatCustomDecals.Font = new System.Drawing.Font("Segoe UI Semibold", 10F, System.Drawing.FontStyle.Bold);
+            this.btnCatCustomDecals.ForeColor = System.Drawing.Color.DarkGray;
+            this.btnCatCustomDecals.ImageAlign = System.Drawing.ContentAlignment.MiddleLeft;
+            this.btnCatCustomDecals.Location = new System.Drawing.Point(0, 630);
+            this.btnCatCustomDecals.Name = "btnCatCustomDecals";
+            this.btnCatCustomDecals.Padding = new System.Windows.Forms.Padding(15, 0, 0, 0);
+            this.btnCatCustomDecals.Size = new System.Drawing.Size(220, 45);
+            this.btnCatCustomDecals.TabIndex = 14;
+            this.btnCatCustomDecals.Tag = "Custom Decals";
+            this.btnCatCustomDecals.Text = " 🖍️   Custom Decals";
+            this.btnCatCustomDecals.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
+            this.btnCatCustomDecals.UseVisualStyleBackColor = true;
+            this.btnCatCustomDecals.Click += new System.EventHandler(this.SidebarCategory_Click);
             // 
             // btnCatEngineAudio
             // 
@@ -585,6 +648,9 @@
         private System.Windows.Forms.Button btnCatAudio;
         private System.Windows.Forms.Button btnCatEngineAudio;
         private System.Windows.Forms.Button btnCatAvatarBorder;
+        private System.Windows.Forms.Button btnCatCustomBoostMeter;
+        private System.Windows.Forms.Button btnCatCustomBalls;
+        private System.Windows.Forms.Button btnCatCustomDecals;
         private MaterialSkin.Controls.MaterialTextBox txtSearch;
     }
 }

@@ -64,6 +64,9 @@ Alphy strictly organizes mods to ensure single-file integrity (only one mod can 
 * **Paint (Finishes)**
 * **Trail**
 * **Wheels**
+* **Custom Decals**
+* **Custom Balls**
+* **Custom Boost Meter**
 
 ---
 
@@ -79,11 +82,24 @@ Alphy strictly organizes mods to ensure single-file integrity (only one mod can 
 
 ## <a id="how-to-use"></a>🎮 How to Use Alphy
 
+### Importing Standard Mods (`.upk` / `.bnk`)
+
 1. Click the **"IMPORT NEW MOD"** button at the bottom of the screen.
 2. Fill out the Mod Name, select what vanilla item the mod replaces, choose the correct Category, and select your `.upk` or `.bnk` mod files.
-3. Once imported, the mod will appear in the grid. Simply click the card to toggle it ON or OFF. 
+3. Once imported, the mod will appear in the grid. Simply click the card to toggle it ON or OFF.
 4. Click the **"SAVE CHANGES"** button. Alphy will automatically secure your original files and replace them with the selected mods.
 5. Launch Rocket League!
+
+### Importing Custom Texture Mods / AlphaConsole ZIPs
+
+Alphy can also import supported AlphaConsole-style `.zip` packs directly. These are used for custom decals, custom balls, and custom boost meters.
+
+1. Click **"IMPORT NEW MOD"** and select the downloaded `.zip` file.
+2. If Alphy detects an AlphaConsole custom texture pack, it will automatically read the pack and fill in the correct mod type, replacement item, name, and preview image when possible.
+3. For custom decals, Alphy can detect supported Octane, Fennec, Dominus, and Universal decal packs. If a pack contains multiple supported car variants, Alphy can import it as one mod that replaces all supported bodies at the same time.
+4. For custom balls and boost meters, Alphy imports the texture pack into the correct custom category and uses the included preview image on the mod card.
+5. After importing, toggle the custom mod ON in the grid and click **"SAVE CHANGES"**. The first apply may take a little longer while Alphy creates backups and safely patches the required game textures.
+6. To switch to a different custom texture later, select the new mod and save again. Alphy will skip unchanged active mods so only the necessary files are updated.
 
 ---
 
@@ -109,6 +125,11 @@ Because it is a native plugin, it is fully automated:
 The Alphy Swapper requires **Python 3.8.0 or newer** to execute the background asset modifications. 
 
 The swapper plugin should automatically install it, but if you run into an error, you will have to install it.
+
+If you get a cryptography module error please install it using CMD:
+1. `python -m pip install --upgrade pip`
+2. `python -m pip install cryptography`
+
 
 ---
 

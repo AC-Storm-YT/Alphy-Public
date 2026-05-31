@@ -13,6 +13,7 @@ A comprehensive, open-source Rocket League cosmetic mod manager designed for saf
 * [Installation & First Setup](#installation)
 * [How to Use Alphy](#how-to-use)
 * [🧩 Plugin System & Alphy Swapper](#plugins)
+* [Swapping Engines](#swapping-engines)
 * [How It Works](#how-it-works)
 * [Community, Tools & Support](#community)
 
@@ -121,15 +122,26 @@ Because it is a native plugin, it is fully automated:
 * **Smart Exporting:** When you generate a swap, the plugin automatically routes the new mod directly into your Alphy `mods/` folder and categorizes it perfectly.
 * **Instant Refresh:** As soon as a swap is generated, the plugin tells Alphy to instantly refresh its interface. Your newly created mod will appear in your grid immediately—**no restarts required!**
 
-#### ⚠️ Prerequisites
-The Alphy Swapper requires **Python 3.8.0 or newer** to execute the background asset modifications. 
+### <a id="swapping-engines"></a>Swapping Engines
 
-The swapper plugin should automatically install it, but if you run into an error, you will have to install it.
+Alphy Swapper now supports selectable swapping engines. A swapping engine is the backend system that reads Rocket League item data, processes the selected donor and target items, and generates the final mod files that Alphy can install.
 
-If you get a cryptography module error please install it using CMD:
+The default engine is **RLUPKTools**. This is the recommended engine for normal use because it is the most complete and is designed to safely rebuild supported `.upk` swaps.
+
+An additional **Alphy** engine is available as a fallback option. It is based on a simpler file replacement style swap system and is intended for cases where a specific swap does not work correctly with the default RLUPKTools engine.
+
+When switching away from RLUPKTools, Alphy Swapper will show a warning because alternate engines may be less stable depending on the item, category, and game files involved. Most users should leave the engine set to **RLUPKTools (Default)** unless they are troubleshooting a specific swap.
+
+The selected engine is remembered between launches, and backend engine files are automatically refreshed from the plugin when an update includes newer versions.
+
+#### Background Dependencies
+Alphy Swapper uses Python in the background to run its asset tools.
+
+The plugin automatically checks for a working Python environment, verifies required packages such as `cryptography`, and installs missing dependencies when needed. If Python is not available, Alphy Swapper can prepare its own portable Python backend inside `%AppData%\AlphySwapper\Backend`.
+
+If you still get a cryptography module error, try restarting Alphy first so the plugin can re-check the backend. As a manual fallback, you can run:
 1. `python -m pip install --upgrade pip`
 2. `python -m pip install cryptography`
-
 
 ---
 

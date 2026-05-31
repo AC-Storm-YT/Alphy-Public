@@ -10,6 +10,7 @@ using System.Drawing;
 using System.Drawing.Drawing2D;
 using System.IO;
 using System.Linq;
+using System.Security.Cryptography;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using static Alphy.Form1;
@@ -407,15 +408,19 @@ namespace Alphy
                     if (IsCustomTextureCategory(mod.Category))
                     {
                         string manifestPath = mod.Files.FirstOrDefault();
-                        string manifestHash = FileChecker.GetFileHash(manifestPath);
-                        if (savedModData[modName] == manifestHash || savedModData[modName] == "custom")
+                        if (!CustomTextureManifestMatches(manifestPath, savedModData[modName]))
+                        {
+                            this.Invoke((MethodInvoker)delegate { mod.Checkbox.Checked = false; });
+                            LogToConsole($"Notice: {modName} state reset (Manifest mismatch).");
+                        }
+                        else if (IsCustomTextureModStillInstalled(manifestPath, mod.Category))
                         {
                             this.Invoke((MethodInvoker)delegate { mod.Checkbox.Checked = true; });
                         }
                         else
                         {
                             this.Invoke((MethodInvoker)delegate { mod.Checkbox.Checked = false; });
-                            LogToConsole($"Notice: {modName} state reset (Manifest mismatch).");
+                            LogToConsole($"Notice: {modName} state reset (File mismatch).");
                         }
                         continue;
                     }
@@ -712,6 +717,9 @@ namespace Alphy
 
                     if (IsCustomTextureCategory(mod.Category))
                     {
+                        if (!IsCustomTextureModStillInstalled(mod.Files.FirstOrDefault(), mod.Category))
+                            continue;
+
                         if (!HandleCustomTextureMod(mod.ModName, mod.Files.FirstOrDefault(), false, mod.Category))
                             overallSuccess = false;
                         continue;
@@ -728,15 +736,20 @@ namespace Alphy
                     {
                         string manifestPath = mod.Files.FirstOrDefault();
                         string manifestHash = FileChecker.GetFileHash(manifestPath);
+                        bool customInstalled = IsCustomTextureModStillInstalled(manifestPath, mod.Category);
                         bool customModUnchanged = mod.WasSavedActive &&
                             (string.Equals(mod.SavedHash, manifestHash, StringComparison.OrdinalIgnoreCase) ||
-                             string.Equals(mod.SavedHash, "custom", StringComparison.OrdinalIgnoreCase));
+                             string.Equals(mod.SavedHash, "custom", StringComparison.OrdinalIgnoreCase)) &&
+                            customInstalled;
 
                         if (customModUnchanged && manifestHash != "error" && manifestHash != "null")
                         {
                             modHashesToSave[mod.ModName] = manifestHash;
                             continue;
                         }
+
+                        if (!customInstalled)
+                            DiscardCustomTextureRangeRecord(manifestPath, mod.Category);
 
                         if (!HandleCustomTextureMod(mod.ModName, mod.Files.FirstOrDefault(), true, mod.Category))
                         {
@@ -796,6 +809,186 @@ namespace Alphy
             return category == "Custom Decals" ||
                    category == "Custom Balls" ||
                    category == "Custom Boost Meter";
+        }
+
+        private bool CustomTextureManifestMatches(string manifestPath, string savedHash)
+        {
+            if (string.IsNullOrWhiteSpace(manifestPath) || !File.Exists(manifestPath))
+                return false;
+
+            string manifestHash = FileChecker.GetFileHash(manifestPath);
+            if (manifestHash == "error" || manifestHash == "null")
+                return false;
+
+            return string.Equals(savedHash, manifestHash, StringComparison.OrdinalIgnoreCase) ||
+                   string.Equals(savedHash, "custom", StringComparison.OrdinalIgnoreCase);
+        }
+
+        private bool IsCustomTextureModStillInstalled(string manifestPath, string category)
+        {
+            if (string.IsNullOrWhiteSpace(gamePath) ||
+                string.IsNullOrWhiteSpace(manifestPath) ||
+                !File.Exists(manifestPath))
+            {
+                return false;
+            }
+
+            string recordPath = GetCustomTextureRangeRecordPath(manifestPath, category);
+            if (string.IsNullOrWhiteSpace(recordPath) || !File.Exists(recordPath))
+                return false;
+
+            try
+            {
+                JObject record = JObject.Parse(File.ReadAllText(recordPath));
+                JArray ranges = record["ranges"] as JArray;
+                if (ranges == null || ranges.Count == 0)
+                    return false;
+
+                bool sawPatchedHash = false;
+                bool sawLegacyRange = false;
+                bool anyLegacyRangeChanged = false;
+
+                foreach (JObject entry in ranges.OfType<JObject>())
+                {
+                    string targetPath = entry["filePath"]?.ToString();
+                    if (string.IsNullOrWhiteSpace(targetPath))
+                        targetPath = entry["tfcPath"]?.ToString();
+
+                    string backupFile = entry["backupFile"]?.ToString();
+                    long offset = entry["offset"]?.ToObject<long>() ?? -1;
+                    int size = entry["size"]?.ToObject<int>() ?? -1;
+
+                    if (string.IsNullOrWhiteSpace(targetPath) ||
+                        string.IsNullOrWhiteSpace(backupFile) ||
+                        offset < 0 ||
+                        size <= 0 ||
+                        !File.Exists(targetPath) ||
+                        !File.Exists(backupFile))
+                    {
+                        return false;
+                    }
+
+                    byte[] originalBytes = File.ReadAllBytes(backupFile);
+                    if (originalBytes.Length != size)
+                        return false;
+
+                    byte[] currentBytes = ReadFileRange(targetPath, offset, size);
+                    if (currentBytes == null)
+                        return false;
+
+                    string patchedSha256 = entry["patchedSha256"]?.ToString();
+                    if (!string.IsNullOrWhiteSpace(patchedSha256))
+                    {
+                        sawPatchedHash = true;
+                        if (!string.Equals(ComputeSha256Hex(currentBytes), patchedSha256, StringComparison.OrdinalIgnoreCase))
+                            return false;
+                        continue;
+                    }
+
+                    sawLegacyRange = true;
+                    if (!currentBytes.SequenceEqual(originalBytes))
+                        anyLegacyRangeChanged = true;
+                }
+
+                if (sawPatchedHash)
+                    return true;
+
+                if (category == "Custom Boost Meter")
+                    return false;
+
+                return sawLegacyRange && anyLegacyRangeChanged;
+            }
+            catch
+            {
+                return false;
+            }
+        }
+
+        private static string ComputeSha256Hex(byte[] data)
+        {
+            using (SHA256 sha = SHA256.Create())
+            {
+                byte[] hash = sha.ComputeHash(data);
+                return BitConverter.ToString(hash).Replace("-", "").ToLowerInvariant();
+            }
+        }
+
+        private byte[] ReadFileRange(string path, long offset, int size)
+        {
+            try
+            {
+                using (FileStream stream = new FileStream(path, FileMode.Open, FileAccess.Read, FileShare.ReadWrite))
+                {
+                    if (stream.Length < offset + size)
+                        return null;
+
+                    byte[] buffer = new byte[size];
+                    stream.Seek(offset, SeekOrigin.Begin);
+                    int totalRead = 0;
+                    while (totalRead < size)
+                    {
+                        int read = stream.Read(buffer, totalRead, size - totalRead);
+                        if (read == 0)
+                            return null;
+                        totalRead += read;
+                    }
+                    return buffer;
+                }
+            }
+            catch
+            {
+                return null;
+            }
+        }
+
+        private string GetCustomTextureRangeRecordPath(string manifestPath, string category)
+        {
+            string action = CustomTextureRangeRecordAction(category);
+            if (string.IsNullOrWhiteSpace(action))
+                return "";
+
+            return Path.Combine(GetCustomTextureBackupDir(manifestPath, category), action + "_ranges.json");
+        }
+
+        private void DiscardCustomTextureRangeRecord(string manifestPath, string category)
+        {
+            string recordPath = GetCustomTextureRangeRecordPath(manifestPath, category);
+            if (string.IsNullOrWhiteSpace(recordPath) || !File.Exists(recordPath))
+                return;
+
+            try
+            {
+                JObject record = JObject.Parse(File.ReadAllText(recordPath));
+                JArray ranges = record["ranges"] as JArray;
+                if (ranges != null)
+                {
+                    foreach (JObject entry in ranges.OfType<JObject>())
+                    {
+                        string backupFile = entry["backupFile"]?.ToString();
+                        if (!string.IsNullOrWhiteSpace(backupFile) && File.Exists(backupFile))
+                            File.Delete(backupFile);
+                    }
+                }
+            }
+            catch
+            {
+            }
+
+            try
+            {
+                File.Delete(recordPath);
+            }
+            catch
+            {
+            }
+        }
+
+        private static string CustomTextureRangeRecordAction(string category)
+        {
+            if (category == "Custom Decals") return "custom_decal";
+            if (category == "Custom Balls") return "custom_ball";
+            if (category == "Custom Boost Meter") return "boost_meter";
+            return "";
         }
 
         private bool IsStandardModStillInstalled(string[] modFiles, string savedHash)

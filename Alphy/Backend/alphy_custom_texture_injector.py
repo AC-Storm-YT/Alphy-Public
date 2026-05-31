@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 import argparse
+import hashlib
 import io
 import json
 import os
@@ -400,29 +401,46 @@ def restore_range_record(record_path: Path) -> int:
     return restored
 
 
+def sha256_bytes(data: bytes) -> str:
+    return hashlib.sha256(data).hexdigest()
+
+
+def read_file_range(file_path: Path, offset: int, size: int) -> bytes:
+    with file_path.open("rb") as fh:
+        fh.seek(offset)
+        data = fh.read(size)
+    if len(data) != size:
+        raise ValueError(f"Could not read file range: {file_path}")
+    return data
+
+
 def record_file_range(file_path: Path,
                       offset: int,
                       size: int,
                       record: dict,
-                      seen_ranges: set) -> None:
+                      seen_ranges: set) -> dict:
     key = (str(file_path).lower(), int(offset), int(size))
     if key in seen_ranges:
-        return
+        for entry in record["ranges"]:
+            existing_path = str(entry.get("filePath") or entry.get("tfcPath") or "").lower()
+            if existing_path == key[0] and int(entry["offset"]) == key[1] and int(entry["size"]) == key[2]:
+                return entry
+        raise ValueError(f"Duplicate backup range could not be found: {file_path}")
+
     idx = len(record["ranges"])
     backup_file = Path(record["backupDir"]) / f"range_{idx:04d}.bin"
-    with file_path.open("rb") as fh:
-        fh.seek(offset)
-        original = fh.read(size)
-    if len(original) != size:
-        raise ValueError(f"Could not read original file range: {file_path}")
+    original = read_file_range(file_path, offset, size)
     backup_file.write_bytes(original)
-    record["ranges"].append({
+    entry = {
         "filePath": str(file_path),
         "offset": int(offset),
         "size": int(size),
         "backupFile": str(backup_file),
-    })
+        "originalSha256": sha256_bytes(original),
+    }
+    record["ranges"].append(entry)
     seen_ranges.add(key)
+    return entry
 
 
 def record_file_size(file_path: Path, record: dict, seen_truncates: set) -> None:
@@ -459,11 +477,12 @@ def write_tfc_payload_in_place(tfc_path: Path,
             f"Encoded texture is too large for in-place TFC patch: "
             f"{len(payload)} > {disk_size}"
         )
-    record_file_range(tfc_path, offset, disk_size, record, seen_ranges)
+    entry = record_file_range(tfc_path, offset, disk_size, record, seen_ranges)
     padded = payload + (b"\x00" * (disk_size - len(payload)))
     with tfc_path.open("r+b") as fh:
         fh.seek(offset)
         fh.write(padded)
+    entry["patchedSha256"] = sha256_bytes(padded)
 
 
 def decompress_rl_chunk_payload(payload: bytes) -> bytes:
@@ -572,11 +591,12 @@ def patch_upk_compressed_chunks_in_place(upk_path: Path,
                 f"Patched UPK chunk grew too much: {len(new_payload)} > {chunk.compressed_size}"
             )
 
-        record_file_range(upk_path, chunk.compressed_offset, chunk.compressed_size, record, seen_ranges)
+        entry = record_file_range(upk_path, chunk.compressed_offset, chunk.compressed_size, record, seen_ranges)
         padded = new_payload + (b"\x00" * (chunk.compressed_size - len(new_payload)))
         with upk_path.open("r+b") as fh:
             fh.seek(chunk.compressed_offset)
             fh.write(padded)
+        entry["patchedSha256"] = sha256_bytes(padded)
 
 
 def replace_upk_with_rebuilt_package(upk_path: Path,
@@ -603,9 +623,11 @@ def replace_upk_with_rebuilt_package(upk_path: Path,
         provider,
         work_dir / f"{source_path.stem}_alphy_rebuilt.upk",
     )
+    rebuilt_bytes = rebuilt.read_bytes()
     record_file_size(upk_path, record, seen_truncates)
-    record_file_range(upk_path, 0, upk_path.stat().st_size, record, seen_ranges)
-    upk_path.write_bytes(rebuilt.read_bytes())
+    entry = record_file_range(upk_path, 0, upk_path.stat().st_size, record, seen_ranges)
+    upk_path.write_bytes(rebuilt_bytes)
+    entry["patchedSha256"] = sha256_bytes(read_file_range(upk_path, 0, int(entry["size"])))
 
 
 def patch_upk_compressed_chunks(upk_path: Path,

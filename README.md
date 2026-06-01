@@ -96,7 +96,13 @@ To use Alphy, you need to:
 3. Click **Authorize with Discord** when Alphy opens.
 4. Paste the authorization code back into Alphy.
 
-Alphy does **not** receive your any account information. Discord handles the authorization page directly.
+### 🔒 Privacy & Network Security
+To handle this validation safely without exposing private API keys, Alphy uses a secure, stateless backend hosted on Cloudflare Workers. 
+
+When you authorize the application:
+* **What passes through:** The temporary Discord authentication code is securely sent to our Cloudflare Worker, which asks Discord to verify your server membership and roles.
+* **Network-level data:** Like almost any web service, Cloudflare automatically processes standard network data (such as your IP address, general region, and timestamps) to route the request and protect our backend from DDoS attacks.
+* **No data retention:** Our backend is completely stateless. **We do not run a database, and we do not store your IP, personal information, or Discord data.** Once the role check is complete, the data is entirely dropped.
 
 Alphy only uses the Discord authorization result needed to verify your username, avatar, server membership, and roles in the official Alphy server. Those roles decide whether you can use the app, plugins, custom mods, or beta-only features.
 

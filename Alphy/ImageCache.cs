@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Drawing;
 using System.IO;
 using System.Net;
@@ -9,7 +9,7 @@ namespace Alphy
     public static class ImageCache
     {
         private static readonly string CacheRoot = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "Alphy", "cache", "icons");
-        private static readonly string GithubBaseUrl = "https://raw.githubusercontent.com/AC-Storm-YT/alphy.github.io/main/icons";
+        private static readonly string GithubBaseUrl = "";
 
         public static async Task<Image> GetModImageAsync(string category, string modName, string replacesName)
         {

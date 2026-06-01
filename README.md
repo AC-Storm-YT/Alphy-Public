@@ -10,7 +10,6 @@ A comprehensive, Rocket League cosmetic mod manager designed for safety, simplic
 * [Core Features & Safety Systems](#security)
 * [Core Features & Safety Systems](#features)
 * [Supported Mod Categories](#categories)
-* [Installation & First Setup](#installation)
 * [Alphy Discord Access](#discord-access)
 * [How to Use Alphy](#how-to-use)
 * [🧩 Plugin System & Alphy Swapper](#plugins)
@@ -68,17 +67,6 @@ Alphy strictly organizes mods to ensure single-file integrity (only one mod can 
 * **Custom Decals**
 * **Custom Balls**
 * **Custom Boost Meter**
-
----
-
-## <a id="installation"></a>📥 Installation & First Setup
-
-1. Download the latest `Alphy.exe` from the [Releases](https://github.com/AC-Storm-YT/Alphy-Public/releases) page.
-2. Place `Alphy.exe` in an empty folder (e.g., `Desktop/Alphy Mod Manager/`). *Do not run it directly from your Downloads folder or inside your Rocket League game files!*
-3. Launch `Alphy.exe`.
-4. Authorize your Discord account when prompted. You must be in the official Alphy Discord server with the required **Member** role to use the official build.
-5. The application will automatically attempt to locate your Rocket League `CookedPCConsole` folder. 
-6. If it cannot find it automatically, a prompt will appear. Navigate to your Rocket League installation and select the `TAGame/CookedPCConsole` folder.
 
 ---
 

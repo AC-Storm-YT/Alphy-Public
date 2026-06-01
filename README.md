@@ -196,4 +196,4 @@ Have questions, want to report a bug, or looking for cosmetic files to download?
 ---
 
 ### Open Source
-Alphy is open-source till update v1.7.1. The open-source project was discontinnued for security measure after update v2.0.0
+Alphy is open-source till update v1.7.1. The open-source project was discontinued for security measure after update v2.0.0

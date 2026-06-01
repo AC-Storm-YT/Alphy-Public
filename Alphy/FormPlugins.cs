@@ -1,4 +1,4 @@
-﻿using MaterialSkin;
+using MaterialSkin;
 using MaterialSkin.Controls;
 using System;
 using System.Drawing;
@@ -99,10 +99,10 @@ namespace Alphy
         {
             btnSwapper.Enabled = false;
 
-            string versionUrl = "https://raw.githubusercontent.com/AC-Storm-YT/alphy.github.io/refs/heads/main/swapper/data/version.txt";
-            string dllUrl = "https://github.com/AC-Storm-YT/alphy.github.io/raw/refs/heads/main/swapper/data/Alphy%20Swapper.dll";
+            string versionUrl = "version.txt";
+            string dllUrl = "";
             string pluginsDir = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), @"Alphy\Plugins");
-            string dllPath = Path.Combine(pluginsDir, "Alphy Swapper.dll");
+            string dllPath = Path.Combine(pluginsDir, "");
 
             try
             {

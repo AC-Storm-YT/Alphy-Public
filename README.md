@@ -191,3 +191,10 @@ The **Alphy Swapper** public source will remain available up to **v1.0.3** for h
 This change was made because v2.0.0 connects to cloud infrastructure and Discord authorization. Keeping backend routing and permission logic public would make the official service easier to abuse.
 
 Official builds remain **clean and unobfuscated**.
+
+
+---
+
+## Credits & Acknowledgements
+
+Thank you to Shadxw (Creator of [Oryx](https://discord.gg/sWhS6F8v9a)) for providing his work. His contributions were vital in fixing and improving the code for update **v1.7.0** (which includes Custom Decals, Custom Balls, and Custom Boost Meters). 

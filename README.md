@@ -1,6 +1,8 @@
 # Alphy
 
-A comprehensive, Rocket League cosmetic mod manager designed for safety, simplicity, and performance. 
+A comprehensive Rocket League cosmetic mod manager designed for safety, simplicity, and performance.
+
+> **Alphy v2.0.0 Notice:** Starting with v2.0.0, the official Alphy application is now closed-source. The public repository remains available as the official README, release, download, and legacy source hub. Public source code is preserved up to **Alphy v1.7.1**.
 
 > ⚠️ **IMPORTANT NOTE:** Alphy is strictly an external file management utility. The application does **NOT** contain, distribute, or provide any proprietary mods or custom items. It is designed solely to safely install, organize, and remove custom cosmetic files (`.upk`, `.bnk`) provided by the user while flawlessly preserving the integrity of the original game files.
 
@@ -10,12 +12,12 @@ A comprehensive, Rocket League cosmetic mod manager designed for safety, simplic
 * [Core Features & Safety Systems](#security)
 * [Core Features & Safety Systems](#features)
 * [Supported Mod Categories](#categories)
-* [Alphy Discord Access](#discord-access)
+* [Discord Access & Privacy](#discord-access)
 * [How to Use Alphy](#how-to-use)
 * [🧩 Plugin System & Alphy Swapper](#plugins)
-* [Swapping Engines](#swapping-engines)
 * [How It Works](#how-it-works)
 * [Community, Tools & Support](#community)
+* [Repository Status](#repository-status)
 
 ---
 
@@ -25,7 +27,12 @@ You might notice that Alphy triggers some warnings on VirusTotal, but **these ar
 
 Because Alphy automates low-level file system operations to safely swap protected game files, some antivirus incorrectly assume the app is acting maliciously.
 
-**Alphy is 100% safe as well as any plugins.**
+Alphy versions up to **v1.7.1** remain available as public source code in this repository.
+
+Starting with **Alphy v2.0.0**, the official build is closed-source because the app now connects to cloud infrastructure and uses Discord authorization for role-based access. Keeping backend routing and security logic public would create unnecessary risk for the official service.
+
+To maintain trust, official Alphy builds are **not obfuscated**. The app remains focused on local file management, safe backups, and cosmetic mod organization.
+
 ---
 
 ## <a id="features"></a>🛡️ Core Features & Safety Systems
@@ -70,11 +77,11 @@ Alphy strictly organizes mods to ensure single-file integrity (only one mod can 
 
 ---
 
-## <a id="discord-access"></a>Alphy Discord Access
+## <a id="discord-access"></a>Discord Access & Privacy
 
-Starting with **Alphy 2.0.0**, the official build uses Discord authorization before opening the app.
+Starting with **Alphy v2.0.0**, the official build uses Discord authorization before opening the app.
 
-This system exists to protect the official Alphy release, manage access and beta features, and make future role-based permissions possible.
+This is used to verify that users are in the official Alphy Discord server and have the required role to use the app. It also allows Alphy to support future role-based permissions, such as beta access, without hardcoding private permission rules into the public release repository.
 
 To use Alphy, you need to:
 
@@ -83,17 +90,13 @@ To use Alphy, you need to:
 3. Click **Authorize with Discord** when Alphy opens.
 4. Paste the authorization code back into Alphy.
 
-### 🔒 Privacy & Network Security
-To handle this validation safely without exposing private API keys, Alphy uses a secure, stateless backend hosted on Cloudflare Workers. 
+Alphy does **not** receive your Discord password, email, private messages, friends list, or Rocket League account information. Discord handles the authorization page directly.
 
-When you authorize the application:
-* **What passes through:** The temporary Discord authentication code is securely sent to our Cloudflare Worker, which asks Discord to verify your server membership and roles.
-* **Network-level data:** Like almost any web service, Cloudflare automatically processes standard network data (such as your IP address, general region, and timestamps) to route the request and protect our backend from DDoS attacks.
-* **No data retention:** Our backend is completely stateless. **We do not run a database, and we do not store your IP, personal information, or Discord data.** Once the role check is complete, the data is entirely dropped.
+Alphy only uses the Discord authorization result needed to verify your Discord account, avatar, server membership, and roles in the official Alphy server. Those roles decide whether you can use the app, plugins, custom mods, or beta-only features.
 
-Alphy only uses the Discord authorization result needed to verify your username, avatar, server membership, and roles in the official Alphy server. Those roles decide whether you can use the app, plugins, custom mods, or beta-only features.
+Alphy's authorization service is hosted through Cloudflare. Like most web and API infrastructure providers, Cloudflare may process standard request metadata needed to route, secure, and debug requests, such as IP address, approximate location/network information, user agent, timestamps, request paths, and diagnostic logs.
 
-If you do not have access yet, join the Discord server and make sure your account has the required role.
+Alphy does not use Cloudflare request metadata to profile users. It is used only as part of the infrastructure that runs the authorization service.
 
 ---
 
@@ -138,26 +141,15 @@ Because it is a native plugin, it is fully automated:
 * **Smart Exporting:** When you generate a swap, the plugin automatically routes the new mod directly into your Alphy `mods/` folder and categorizes it perfectly.
 * **Instant Refresh:** As soon as a swap is generated, the plugin tells Alphy to instantly refresh its interface. Your newly created mod will appear in your grid immediately—**no restarts required!**
 
-### <a id="swapping-engines"></a>Swapping Engines
+#### ⚠️ Prerequisites
+The Alphy Swapper requires **Python 3.8.0 or newer** to execute the background asset modifications. 
 
-Alphy Swapper now supports selectable swapping engines. A swapping engine is the backend system that reads Rocket League item data, processes the selected donor and target items, and generates the final mod files that Alphy can install.
+The swapper plugin should automatically install it, but if you run into an error, you will have to install it.
 
-The default engine is **RLUPKTools**. This is the recommended engine for normal use because it is the most complete and is designed to safely rebuild supported `.upk` swaps.
-
-An additional **Alphy** engine is available as a fallback option. It is based on a simpler file replacement style swap system and is intended for cases where a specific swap does not work correctly with the default RLUPKTools engine.
-
-When switching away from RLUPKTools, Alphy Swapper will show a warning because alternate engines may be less stable depending on the item, category, and game files involved. Most users should leave the engine set to **RLUPKTools (Default)** unless they are troubleshooting a specific swap.
-
-The selected engine is remembered between launches, and backend engine files are automatically refreshed from the plugin when an update includes newer versions.
-
-#### Background Dependencies
-Alphy Swapper uses Python in the background to run its asset tools.
-
-The plugin automatically checks for a working Python environment, verifies required packages such as `cryptography`, and installs missing dependencies when needed. If Python is not available, Alphy Swapper can prepare its own portable Python backend inside `%AppData%\AlphySwapper\Backend`.
-
-If you still get a cryptography module error, try restarting Alphy first so the plugin can re-check the backend. As a manual fallback, you can run:
+If you get a cryptography module error please install it using CMD:
 1. `python -m pip install --upgrade pip`
 2. `python -m pip install cryptography`
+
 
 ---
 
@@ -168,6 +160,7 @@ For developers and curious users, here is how Alphy manages your files locally:
 * **Mod Storage:** Imported mods are stored within the `mods/` directory right next to your `Alphy.exe` file.
 * **Backups:** Original game file backups (`.bak`) are securely saved to your local AppData folder at `%AppData%\Alphy\Backups`.
 * **Configuration:** Your active mod states, digital seals, and saved file paths are stored at `%AppData%\Alphy\Config\settings.txt`.
+* **Discord Session:** Your local authorization session is stored at `%AppData%\Alphy\Auth\session.json` so you do not need to authorize every time you open Alphy.
 * **Plugins:** Installed plugin modules (`.dll` files) are stored and loaded from `%AppData%\Alphy\Plugins`.
 * **UI Framework:** The application interface is built using `MaterialSkin` to provide a clean, accessible, dark-themed experience.
 
@@ -183,5 +176,18 @@ Have questions, want to report a bug, or looking for cosmetic files to download?
 
 ---
 
-### Open Source
-Alphy is open-source till update v1.7.1. The open-source project was discontinued for security measure after update v2.0.0
+## <a id="repository-status"></a>Repository Status
+
+Alphy is transitioning to a closed-source official build starting with **v2.0.0**.
+
+This repository will stay online as the official public hub for:
+
+* Downloading official releases.
+* Reading the latest README and usage information.
+* Preserving legacy source code up to **Alphy v1.7.1**.
+
+The **Alphy Swapper** public source will remain available up to **v1.0.3** for history and transparency, but newer official plugin builds are closed-source.
+
+This change was made because v2.0.0 connects to cloud infrastructure and Discord authorization. Keeping backend routing and permission logic public would make the official service easier to abuse.
+
+Official builds remain **clean and unobfuscated**.

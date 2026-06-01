@@ -1,6 +1,6 @@
 # Alphy
 
-A comprehensive, open-source Rocket League cosmetic mod manager designed for safety, simplicity, and performance. 
+A comprehensive, Rocket League cosmetic mod manager designed for safety, simplicity, and performance. 
 
 > ⚠️ **IMPORTANT NOTE:** Alphy is strictly an external file management utility. The application does **NOT** contain, distribute, or provide any proprietary mods or custom items. It is designed solely to safely install, organize, and remove custom cosmetic files (`.upk`, `.bnk`) provided by the user while flawlessly preserving the integrity of the original game files.
 
@@ -26,8 +26,7 @@ You might notice that Alphy triggers some warnings on VirusTotal, but **these ar
 
 Because Alphy automates low-level file system operations to safely swap protected game files, some antivirus incorrectly assume the app is acting maliciously.
 
-**Alphy is 100% open-source as well as any plugins.** You can review every single line of code in this repository to verify exactly how it interacts with your files. If you are ever concerned, you are entirely free to compile the application yourself using Visual Studio!
-
+**Alphy is 100% safe as well as any plugins.**
 ---
 
 ## <a id="features"></a>🛡️ Core Features & Safety Systems
@@ -87,7 +86,7 @@ Alphy strictly organizes mods to ensure single-file integrity (only one mod can 
 
 Starting with **Alphy 2.0.0**, the official build uses Discord authorization before opening the app.
 
-This system exists to protect the official Alphy release, manage access and beta features, and make future role-based permissions possible without hardcoding private permission rules into the open-source project.
+This system exists to protect the official Alphy release, manage access and beta features, and make future role-based permissions possible.
 
 To use Alphy, you need to:
 
@@ -197,4 +196,4 @@ Have questions, want to report a bug, or looking for cosmetic files to download?
 ---
 
 ### Open Source
-Alphy is 100% open-source. This ensures complete transparency regarding how your local game files are handled. We welcome code reviews, feedback, and requests from the community.
+Alphy is open-source till update v1.7.1. The open-source project was discontinnued for security measure after update v2.0.0

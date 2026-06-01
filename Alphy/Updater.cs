@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.IO;
 using System.Linq;
 using System.Net;
@@ -9,8 +9,8 @@ namespace Alphy
 {
     public static class Updater
     {
-        private static string githubVersionUrl = "https://github.com/AC-Storm-YT/alphy.github.io/raw/refs/heads/main/version.txt";
-        private static string githubZipUrl = "https://github.com/AC-Storm-YT/alphy.github.io/raw/refs/heads/main/alphy.zip";
+        private static string githubVersionUrl = "";
+        private static string githubZipUrl = "";
 
         public static string LocalVersion = "1.7.1";
 

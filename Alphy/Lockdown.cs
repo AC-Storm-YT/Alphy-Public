@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.IO;
 using System.Net;
 
@@ -6,7 +6,7 @@ namespace Alphy
 {
     public static class Lockdown
     {
-        private static string githubLockdownUrl = "https://github.com/AC-Storm-YT/alphy.github.io/raw/refs/heads/main/lockdown.txt";
+        private static string githubLockdownUrl = "";
 
         public static bool IsInLockdown()
         {

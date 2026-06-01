@@ -11,6 +11,7 @@ A comprehensive, open-source Rocket League cosmetic mod manager designed for saf
 * [Core Features & Safety Systems](#features)
 * [Supported Mod Categories](#categories)
 * [Installation & First Setup](#installation)
+* [Alphy Discord Access](#discord-access)
 * [How to Use Alphy](#how-to-use)
 * [🧩 Plugin System & Alphy Swapper](#plugins)
 * [Swapping Engines](#swapping-engines)
@@ -76,8 +77,30 @@ Alphy strictly organizes mods to ensure single-file integrity (only one mod can 
 1. Download the latest `Alphy.exe` from the [Releases](https://github.com/AC-Storm-YT/Alphy-Public/releases) page.
 2. Place `Alphy.exe` in an empty folder (e.g., `Desktop/Alphy Mod Manager/`). *Do not run it directly from your Downloads folder or inside your Rocket League game files!*
 3. Launch `Alphy.exe`.
-4. The application will automatically attempt to locate your Rocket League `CookedPCConsole` folder. 
-5. If it cannot find it automatically, a prompt will appear. Navigate to your Rocket League installation and select the `TAGame/CookedPCConsole` folder.
+4. Authorize your Discord account when prompted. You must be in the official Alphy Discord server with the required **Member** role to use the official build.
+5. The application will automatically attempt to locate your Rocket League `CookedPCConsole` folder. 
+6. If it cannot find it automatically, a prompt will appear. Navigate to your Rocket League installation and select the `TAGame/CookedPCConsole` folder.
+
+---
+
+## <a id="discord-access"></a>Alphy Discord Access
+
+Starting with **Alphy 2.0.0**, the official build uses Discord authorization before opening the app.
+
+This system exists to protect the official Alphy release, manage access and beta features, and make future role-based permissions possible without hardcoding private permission rules into the open-source project.
+
+To use Alphy, you need to:
+
+1. Join the official Alphy Discord server: [https://discord.gg/A2mrCVdpPw](https://discord.gg/A2mrCVdpPw)
+2. Have the required **Member** role.
+3. Click **Authorize with Discord** when Alphy opens.
+4. Paste the authorization code back into Alphy.
+
+Alphy does **not** receive your any account information. Discord handles the authorization page directly.
+
+Alphy only uses the Discord authorization result needed to verify your username, avatar, server membership, and roles in the official Alphy server. Those roles decide whether you can use the app, plugins, custom mods, or beta-only features.
+
+If you do not have access yet, join the Discord server and make sure your account has the required role.
 
 ---
 
@@ -163,7 +186,7 @@ Have questions, want to report a bug, or looking for cosmetic files to download?
 
 * 🖼️ **Asset Database:** [Alphy Items Database](https://ac-storm-yt.github.io/alphy-items.github.io/) (Find exact item IDs for mod importation)
 * 🌐 **Website:** [Alphy Official Site](https://ac-storm-yt.github.io/alphy.github.io/)
-* 💬 **Discord:** [Join the Alphy Community Server](https://discord.gg/UuC5j8smR7)
+* 💬 **Discord:** [Join the Alphy Community Server](https://discord.gg/A2mrCVdpPw)
 
 ---
 

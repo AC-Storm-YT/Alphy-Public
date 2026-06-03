@@ -194,9 +194,9 @@ It integrates with Alphy:
 * **Zero Configuration:** It reads the game directory from Alphy.
 * **Smart Exporting:** Generated swaps are routed directly into the Alphy `mods/` folder.
 * **Instant Refresh:** New generated mods appear in Alphy without restarting.
-* **Multiple Engines:** Users can choose between RLUPKTools, Alphy Engine, and Alphy Pro [BETA].
+* **Multiple Engines:** Users can choose between Alphy Pro (Extreme), Alphy Pro, Alphy, and RLUPKTools.
 
-RLUPKTools is the default and recommended engine. Other engines are intended for cases where a specific swap does not work with the default engine.
+Alphy Pro (Extreme) is the default and recommended engine. Other engines are intended for cases where a specific swap does not work with the default engine.
 
 ### Prerequisites
 

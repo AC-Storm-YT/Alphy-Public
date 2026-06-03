@@ -1,79 +1,101 @@
 # Alphy
 
-A comprehensive Rocket League cosmetic mod manager designed for safety, simplicity, and performance.
+A Rocket League cosmetic mod manager designed for safer local file swapping, custom imports, backups, mod sharing, and plugins.
 
-> **Alphy v2.0.0 Notice:** Starting with v2.0.0, the official Alphy application is now closed-source. The public repository remains available as the official README, release, download, and legacy source hub. Public source code is preserved up to **Alphy v1.7.1**.
+> **Alphy v2.2.0 Notice:** Starting with v2.0.0, the official Alphy application is closed-source. The public repository remains available as the official README, release, download, and legacy source hub. Public source code is preserved up to **Alphy v1.7.1**.
 
-> ⚠️ **IMPORTANT NOTE:** Alphy is strictly an external file management utility. The application does **NOT** contain, distribute, or provide any proprietary mods or custom items. It is designed solely to safely install, organize, and remove custom cosmetic files (`.upk`, `.bnk`) provided by the user while flawlessly preserving the integrity of the original game files.
+> **Important:** Alphy is an external file management utility. It does **not** contain, distribute, or provide proprietary mods, paid items, or preloaded mod packs. Users import and manage their own cosmetic files.
 
 ---
 
-## 📋 Table of Contents
-* [Core Features & Safety Systems](#security)
-* [Core Features & Safety Systems](#features)
-* [Supported Mod Categories](#categories)
+## Table of Contents
+
+* [Security & False Positives](#security)
+* [Core Features](#features)
+* [Supported Categories](#categories)
 * [Discord Access & Privacy](#discord-access)
 * [How to Use Alphy](#how-to-use)
-* [🧩 Plugin System & Alphy Swapper](#plugins)
+* [Plugin System & Alphy Swapper](#plugins)
 * [How It Works](#how-it-works)
 * [Community, Tools & Support](#community)
 * [Repository Status](#repository-status)
 
 ---
 
-## <a id="security"></a>🛡️ Security & False Positives
+## <a id="security"></a>Security & False Positives
 
-You might notice that Alphy triggers some warnings on VirusTotal, but **these are false positives**. 
+Some antivirus tools may flag modding utilities because they edit game files, launch helper scripts, or perform automated file operations.
 
-Because Alphy automates low-level file system operations to safely swap protected game files, some antivirus incorrectly assume the app is acting maliciously.
+Alphy does **not** inject into Rocket League, does **not** hook game memory, and does **not** need to run inside the game process.
 
-Alphy versions up to **v1.7.1** remain available as public source code in this repository.
+Alphy works by editing local asset files, creating backups, and restoring files when needed.
 
-Starting with **Alphy v2.0.0**, the official build is closed-source because the app now connects to cloud infrastructure and uses Discord authorization for role-based access. Keeping backend routing and security logic public would create unnecessary risk for the official service.
+Starting with **Alphy v2.0.0**, the official build is closed-source because the app connects to cloud infrastructure and uses Discord authorization for role-based access. Keeping backend routing and security logic public would create unnecessary risk for the official service.
 
-To maintain trust, official Alphy builds are **not obfuscated**. The app remains focused on local file management, safe backups, and cosmetic mod organization.
-
----
-
-## <a id="features"></a>🛡️ Core Features & Safety Systems
-
-Alphy is built from the ground up to ensure your game files are never corrupted. It utilizes several automated background systems to protect your installation.
-
-### 1. Cloud Safety Lockdown & Live Build Tracking
-Alphy continuously cross-references your local Rocket League `.exe` version and the live server build via the cloud. If an unexpected game patch is released, Alphy detects the build mismatch instantly and automatically locks the application's modding capabilities. This guarantees that incompatible mods are never injected into a freshly updated game, completely preventing crashes and file corruption.
-
-### 2. Smart Hash-Sync Backups
-Before Alphy applies any mods, it performs a cryptographic hash check on your local game files. If a file is original (vanilla), Alphy automatically secures a backup. When a mod is removed, Alphy intelligently restores that specific backup, ensuring your game is always left in a clean, pristine state.
-
-### 3. Digital Sealing
-Active mods are "sealed" with digital fingerprints. If you verify your game files through Epic Games or Steam (which overwrites mods with vanilla files), Alphy will automatically detect the overwrite on its next launch, disable the affected mods in its interface, and prevent ghost-file conflicts.
-
-### 4. Advanced UI & Rendering
-Alphy features a Master-Detail UI with a persistent sidebar, real-time search filtering, and custom scroll-rendering technology to ensure the interface remains smooth and tear-free, regardless of how many mods you install.
-
-### 5. Extensible Plugin Architecture
-Alphy features a built-in Plugin Manager that allows the community to expand its capabilities. Official plugins (like the Alphy Swapper) integrate directly into the app, automatically syncing with your game paths and refreshing the UI instantly without ever needing to restart the manager.
+Official Alphy builds are **not obfuscated**.
 
 ---
 
-## <a id="categories"></a>🏷️ Supported Mod Categories
+## <a id="features"></a>Core Features
 
-Alphy strictly organizes mods to ensure single-file integrity (only one mod can be active per category to prevent overlap crashes).
+### Visual Mod Manager
 
-* **Antenna**
-* **Banner**
-* **Body**
-* **Boost**
-* **Boost Audio**
-* **Decal**
-* **Goal Explosion**
-* **Hat (Toppers)**
-* **Paint (Finishes)**
-* **Trail**
-* **Wheels**
-* **Custom Decals**
-* **Custom Balls**
-* **Custom Boost Meter**
+Alphy uses a visual mod grid with categories, search, icons, active counts, and a modern dark interface.
+
+### No Injection
+
+Alphy operates outside of game memory. It only performs local file operations.
+
+### Smart Backups
+
+Before changing Rocket League files, Alphy creates vanilla backups in `%AppData%\Alphy\Backups`. Those backups are used to restore files when mods are removed or disabled.
+
+### Digital Sealing & Mismatch Detection
+
+If you verify game files or Rocket League updates restore modded files back to vanilla, Alphy detects the mismatch and resets affected mod states.
+
+### Custom Texture Support
+
+Alphy supports compatible custom decals, custom balls, and custom boost meters, including supported AlphaConsole-style ZIP packs.
+
+### Mod Export & Mod Packs
+
+Alphy v2.2.0 adds a dedicated Export Mods window. You can export one mod as a shareable ZIP or export multiple mods as a `mods.zip` pack.
+
+Exports do not include vanilla backup files or backup folders. The receiving Alphy install creates missing backups from that user's own Rocket League files when needed.
+
+### Improved Setup Flow
+
+If no valid game path is saved, Alphy requires the user to select the installation folder named `rocketleague` before the app unlocks. The folder can be changed later from Settings.
+
+### Improved Remove Mods
+
+The Remove Mods window now uses a searchable checklist similar to Export Mods while keeping the restore-active-mod-before-delete safety behavior.
+
+### Plugin Architecture
+
+Alphy includes a Plugin Manager for official tools like Alphy Swapper.
+
+---
+
+## <a id="categories"></a>Supported Categories
+
+* Antenna
+* Banner
+* Body
+* Boost
+* Boost Audio
+* Decal
+* Goal Explosion
+* Hat / Toppers
+* Paint / Finishes
+* Trail
+* Wheels
+* Engine Audio
+* Avatar Border
+* Custom Decals
+* Custom Balls
+* Custom Boost Meter
 
 ---
 
@@ -81,120 +103,155 @@ Alphy strictly organizes mods to ensure single-file integrity (only one mod can 
 
 Starting with **Alphy v2.0.0**, the official build uses Discord authorization before opening the app.
 
-This is used to verify that users are in the official Alphy Discord server and have the required role to use the app. It also allows Alphy to support future role-based permissions, such as beta access, without hardcoding private permission rules into the public release repository.
+This verifies that users are in the official Alphy Discord server and have the required role to use the official build. It also supports future role-based permissions, such as beta features, plugins, or custom tools.
 
-To use Alphy, you need to:
+To use Alphy:
 
 1. Join the official Alphy Discord server: [https://discord.gg/A2mrCVdpPw](https://discord.gg/A2mrCVdpPw)
 2. Have the required **Member** role.
 3. Click **Authorize with Discord** when Alphy opens.
-4. Paste the authorization code back into Alphy.
+4. Approve the Discord authorization page.
+5. Paste the authorization code back into Alphy.
 
 Alphy does **not** receive your Discord password, email, private messages, friends list, or Rocket League account information. Discord handles the authorization page directly.
 
-Alphy only uses the Discord authorization result needed to verify your Discord account, avatar, server membership, and roles in the official Alphy server. Those roles decide whether you can use the app, plugins, custom mods, or beta-only features.
+Alphy only uses the Discord authorization result needed to verify your Discord account, avatar, server membership, and roles in the official Alphy server.
 
 Alphy's authorization service is hosted through Cloudflare. Like most web and API infrastructure providers, Cloudflare may process standard request metadata needed to route, secure, and debug requests, such as IP address, approximate location/network information, user agent, timestamps, request paths, and diagnostic logs.
 
 Alphy does not use Cloudflare request metadata to profile users. It is used only as part of the infrastructure that runs the authorization service.
 
+Sessions currently last up to **30 days**.
+
 ---
 
-## <a id="how-to-use"></a>🎮 How to Use Alphy
+## <a id="how-to-use"></a>How to Use Alphy
+
+### First-Time Setup
+
+1. Launch Alphy and authorize with Discord.
+2. If Alphy asks for the game folder, select the folder named `rocketleague`.
+3. Alphy validates the folder and stores the internal `TAGame\CookedPCConsole` path automatically.
+4. You can change the folder later from **Settings**.
 
 ### Importing Standard Mods (`.upk` / `.bnk`)
 
-1. Click the **"IMPORT NEW MOD"** button at the bottom of the screen.
-2. Fill out the Mod Name, select what vanilla item the mod replaces, choose the correct Category, and select your `.upk` or `.bnk` mod files.
-3. Once imported, the mod will appear in the grid. Simply click the card to toggle it ON or OFF.
-4. Click the **"SAVE CHANGES"** button. Alphy will automatically secure your original files and replace them with the selected mods.
-5. Launch Rocket League!
+1. Click **IMPORT NEW MOD**.
+2. Enter the mod name, replacement item, category, and select the `.upk` or `.bnk` file.
+3. The mod appears in the grid.
+4. Toggle the mod ON and click **SAVE CHANGES**.
 
 ### Importing Custom Texture Mods / AlphaConsole ZIPs
 
-Alphy can also import supported AlphaConsole-style `.zip` packs directly. These are used for custom decals, custom balls, and custom boost meters.
+Alphy can import supported AlphaConsole-style `.zip` packs for custom decals, custom balls, and custom boost meters.
 
-1. Click **"IMPORT NEW MOD"** and select the downloaded `.zip` file.
-2. If Alphy detects an AlphaConsole custom texture pack, it will automatically read the pack and fill in the correct mod type, replacement item, name, and preview image when possible.
-3. For custom decals, Alphy can detect supported Octane, Fennec, Dominus, and Universal decal packs. If a pack contains multiple supported car variants, Alphy can import it as one mod that replaces all supported bodies at the same time.
-4. For custom balls and boost meters, Alphy imports the texture pack into the correct custom category and uses the included preview image on the mod card.
-5. After importing, toggle the custom mod ON in the grid and click **"SAVE CHANGES"**. The first apply may take a little longer while Alphy creates backups and safely patches the required game textures.
-6. To switch to a different custom texture later, select the new mod and save again. Alphy will skip unchanged active mods so only the necessary files are updated.
+1. Click **IMPORT NEW MOD** and select the `.zip` file.
+2. Alphy reads supported packs and fills in the mod type, replacement item, name, and preview image when possible.
+3. Toggle the imported custom mod ON and click **SAVE CHANGES**.
+
+### Importing Alphy Mods and Mod Packs
+
+Alphy v2.2.0 can import mods exported from Alphy.
+
+* A single exported mod usually looks like `Fennec (Replaces Octane).zip`.
+* A multi-mod pack is named `mods.zip`.
+* Mod packs preserve category folders, such as `Body\Fennec (Replaces Octane)`.
+
+To import one, click **IMPORT NEW MOD**, select the ZIP, and Alphy restores it into the correct folder automatically.
+
+### Exporting Mods
+
+1. Click **EXPORT MODS**.
+2. Search for the mod or mods you want to export.
+3. Select one mod to create a single shareable ZIP.
+4. Select multiple mods to create a `mods.zip` pack.
+
+Exported ZIPs do not include backup files, backup folders, or temporary Alphy export metadata.
+
+### Removing Mods
+
+1. Click **REMOVE MODS**.
+2. Search for the mods you want to delete.
+3. Select one or more mods and click **Remove Selected**.
+4. If a selected mod is active, Alphy restores the game files back to vanilla before deleting the mod.
 
 ---
 
-## <a id="plugins"></a>🧩 Plugin System & Alphy Swapper
+## <a id="plugins"></a>Plugin System & Alphy Swapper
 
-Alphy now supports an extensible Plugin System! Plugins allow you to add powerful new tools directly inside the Alphy interface.
+Alphy supports official plugins through the Plugin Manager.
 
 ### The Plugin Manager
 
-To access the Plugin Manager, click the **"Plugins"** button located at the bottom of the right sidebar. This menu allows you to browse, download, install, and update official plugins directly from the cloud with a single click.
+Click **Plugins** inside Alphy to browse, download, install, and update official plugins directly from the cloud.
 
 ### Official Plugin: Alphy Swapper
 
-The **Alphy Swapper** is an advanced, asset swapper that allows you to generate your own custom mods by swapping internal Rocket League `.upk` files.
+**Alphy Swapper** is an asset swapper that lets users generate custom mods by swapping internal Rocket League `.upk` files.
 
-Because it is a native plugin, it is fully automated:
+It integrates with Alphy:
 
-* **Zero Configuration:** It automatically pulls your game directory straight from Alphy's memory. You don't need to manually link any folders.
-* **Smart Exporting:** When you generate a swap, the plugin automatically routes the new mod directly into your Alphy `mods/` folder and categorizes it perfectly.
-* **Instant Refresh:** As soon as a swap is generated, the plugin tells Alphy to instantly refresh its interface. Your newly created mod will appear in your grid immediately—**no restarts required!**
+* **Zero Configuration:** It reads the game directory from Alphy.
+* **Smart Exporting:** Generated swaps are routed directly into the Alphy `mods/` folder.
+* **Instant Refresh:** New generated mods appear in Alphy without restarting.
+* **Multiple Engines:** Users can choose between RLUPKTools, Alphy Engine, and Alphy Pro [BETA].
 
-#### ⚠️ Prerequisites
-The Alphy Swapper requires **Python 3.8.0 or newer** to execute the background asset modifications. 
+RLUPKTools is the default and recommended engine. Other engines are intended for cases where a specific swap does not work with the default engine.
 
-The swapper plugin should automatically install it, but if you run into an error, you will have to install it.
+### Prerequisites
 
-If you get a cryptography module error please install it using CMD:
-1. `python -m pip install --upgrade pip`
-2. `python -m pip install cryptography`
+Alphy Swapper uses Python for some backend operations. The plugin should automatically prepare what it needs, including modules such as `cryptography`.
 
+If you still get a cryptography error, install Python 64-bit and run:
 
----
-
-## <a id="how-it-works"></a>🔧 How It Works
-
-For developers and curious users, here is how Alphy manages your files locally:
-
-* **Mod Storage:** Imported mods are stored within the `mods/` directory right next to your `Alphy.exe` file.
-* **Backups:** Original game file backups (`.bak`) are securely saved to your local AppData folder at `%AppData%\Alphy\Backups`.
-* **Configuration:** Your active mod states, digital seals, and saved file paths are stored at `%AppData%\Alphy\Config\settings.txt`.
-* **Discord Session:** Your local authorization session is stored at `%AppData%\Alphy\Auth\session.json` so you do not need to authorize every time you open Alphy.
-* **Plugins:** Installed plugin modules (`.dll` files) are stored and loaded from `%AppData%\Alphy\Plugins`.
-* **UI Framework:** The application interface is built using `MaterialSkin` to provide a clean, accessible, dark-themed experience.
+```cmd
+python -m pip install --upgrade pip
+python -m pip install cryptography
+```
 
 ---
 
-## <a id="community"></a>🤝 Community, Tools & Support
+## <a id="how-it-works"></a>How It Works
 
-Have questions, want to report a bug, or looking for cosmetic files to download? Join the community!
+For developers and curious users, here is how Alphy manages files locally:
 
-* 🖼️ **Asset Database:** [Alphy Items Database](https://ac-storm-yt.github.io/alphy-items.github.io/) (Find exact item IDs for mod importation)
-* 🌐 **Website:** [Alphy Official Site](https://ac-storm-yt.github.io/alphy.github.io/)
-* 💬 **Discord:** [Join the Alphy Community Server](https://discord.gg/A2mrCVdpPw)
+* **Mod Storage:** Imported mods are stored in the `mods/` directory next to `Alphy.exe`.
+* **Backups:** Original game file backups (`.bak`) are saved to `%AppData%\Alphy\Backups`.
+* **Configuration:** Active mod states, digital seals, and saved file paths are stored at `%AppData%\Alphy\Config\settings.txt`.
+* **Discord Session:** The local authorization session is stored at `%AppData%\Alphy\Auth\session.json`.
+* **Plugins:** Installed plugin modules are stored in `%AppData%\Alphy\Plugins`.
+* **Exports:** Shared mod ZIPs do not include vanilla backups. Backups are recreated from the receiver's own game files when needed.
+
+---
+
+## <a id="community"></a>Community, Tools & Support
+
+* **Asset Database:** [Alphy Items Database](https://ac-storm-yt.github.io/alphy-items.github.io/)
+* **Website:** [Alphy Official Site](https://ac-storm-yt.github.io/alphy.github.io/)
+* **Discord:** [Join the Alphy Community Server](https://discord.gg/A2mrCVdpPw)
 
 ---
 
 ## <a id="repository-status"></a>Repository Status
 
-Alphy is transitioning to a closed-source official build starting with **v2.0.0**.
+Alphy is closed-source starting with **v2.0.0**.
 
-This repository will stay online as the official public hub for:
+This repository remains online as the official public hub for:
 
 * Downloading official releases.
 * Reading the latest README and usage information.
 * Preserving legacy source code up to **Alphy v1.7.1**.
 
-The **Alphy Swapper** public source will remain available up to **v1.0.3** for history and transparency, but newer official plugin builds are closed-source.
+The **Alphy Swapper** public source remains available up to **v1.0.3** for history and transparency, but newer official plugin builds are closed-source.
 
 This change was made because v2.0.0 connects to cloud infrastructure and Discord authorization. Keeping backend routing and permission logic public would make the official service easier to abuse.
 
 Official builds remain **clean and unobfuscated**.
 
-
 ---
 
-## Credits & Acknowledgements
+## Credits
 
-Thank you to Shadxw (Creator of [Oryx](https://discord.gg/sWhS6F8v9a)) for providing his work. His contributions were vital in fixing and improving the code for update **v1.7.0** (which includes Custom Decals, Custom Balls, and Custom Boost Meters). 
+Shadxw also provided his work for the swapping system used in [Oryx](https://discord.gg/sWhS6F8v9a), which allowed me to create a fallback engine for Alphy Swapper **v1.1.0**. (Discontinued)
+
+Additional thanks to Crunchy and [RLUPKTools](https://github.com/CrunchyRL/RLUPKTools) for the foundational technical research.

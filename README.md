@@ -2,7 +2,7 @@
 
 A Rocket League cosmetic mod manager designed for safer local file swapping, custom imports, backups, mod sharing, and plugins.
 
-> **Alphy v2.2.0 Notice:** Starting with v2.0.0, the official Alphy application is closed-source. The public repository remains available as the official README, release, download, and legacy source hub. Public source code is preserved up to **Alphy v1.7.1**.
+> **Alphy v2.2.5 Notice:** Starting with v2.0.0, the official Alphy application is closed-source. The public repository remains available as the official README, release, download, and legacy source hub. Public source code is preserved up to **Alphy v1.7.1**.
 
 > **Important:** Alphy is an external file management utility. It does **not** contain, distribute, or provide proprietary mods, paid items, or preloaded mod packs. Users import and manage their own cosmetic files.
 
@@ -60,7 +60,7 @@ Alphy supports compatible custom decals, custom balls, and custom boost meters, 
 
 ### Mod Export & Mod Packs
 
-Alphy v2.2.0 adds a dedicated Export Mods window. You can export one mod as a shareable ZIP or export multiple mods as a `mods.zip` pack.
+Alphy includes a dedicated Export Mods window. You can export one mod as a shareable ZIP or export multiple mods as a `mods.zip` pack.
 
 Exports do not include vanilla backup files or backup folders. The receiving Alphy install creates missing backups from that user's own Rocket League files when needed.
 
@@ -75,6 +75,10 @@ The Remove Mods window now uses a searchable checklist similar to Export Mods wh
 ### Plugin Architecture
 
 Alphy includes a Plugin Manager for official tools like Alphy Swapper.
+
+### Account Access Protection
+
+Alphy uses Discord authorization and a random local install ID to help prevent account access sharing. An account can only be linked to one Alphy install at a time unless the user logs out, switches account, or contacts the development team for a reset.
 
 ---
 
@@ -117,11 +121,17 @@ Alphy does **not** receive your Discord password, email, private messages, frien
 
 Alphy only uses the Discord authorization result needed to verify your Discord account, avatar, server membership, and roles in the official Alphy server.
 
+Alphy also creates a random local install ID after the user accepts the access requirement. This is not your hardware serial number, Discord password, Rocket League account, or personal file data. It is a random ID used to link one Discord account to one Alphy install.
+
+The local install ID is protected on Windows and sent to Alphy Auth when access is checked. The server stores a hashed version of that install ID and a hashed authorization-code fingerprint. The real authorization code is not stored by the server.
+
+If an authorization code is copied to another PC, Alphy Auth rejects it and resets that shared code. If an account is already linked to another device, users must either use **Logout** or **Switch account** on the original device, or contact the development team to reset and use the account on a new device.
+
 Alphy's authorization service is hosted through Cloudflare. Like most web and API infrastructure providers, Cloudflare may process standard request metadata needed to route, secure, and debug requests, such as IP address, approximate location/network information, user agent, timestamps, request paths, and diagnostic logs.
 
 Alphy does not use Cloudflare request metadata to profile users. It is used only as part of the infrastructure that runs the authorization service.
 
-Sessions currently last up to **30 days**.
+Alphy silently checks Discord access while the app is open. This does **not** force users to re-login every few minutes. Users normally re-authorize every **30 days**, unless access is revoked, the session expires, the account is reset, or the device link no longer matches.
 
 ---
 
@@ -133,6 +143,15 @@ Sessions currently last up to **30 days**.
 2. If Alphy asks for the game folder, select the folder named `rocketleague`.
 3. Alphy validates the folder and stores the internal `TAGame\CookedPCConsole` path automatically.
 4. You can change the folder later from **Settings**.
+
+### Discord Account Access
+
+Alphy must be authorized with a Discord account that has access to the official Alphy server.
+
+* **Refresh access** checks your current roles and permissions.
+* **Logout** releases your linked device and closes the current session.
+* **Switch account** releases your linked device and sends you back to the login screen.
+* If you want to use your account on a new device and cannot access the old one, contact the development team for a reset.
 
 ### Importing Standard Mods (`.upk` / `.bnk`)
 
@@ -151,7 +170,7 @@ Alphy can import supported AlphaConsole-style `.zip` packs for custom decals, cu
 
 ### Importing Alphy Mods and Mod Packs
 
-Alphy v2.2.0 can import mods exported from Alphy.
+Alphy can import mods exported from Alphy.
 
 * A single exported mod usually looks like `Fennec (Replaces Octane).zip`.
 * A multi-mod pack is named `mods.zip`.
@@ -196,7 +215,7 @@ It integrates with Alphy:
 * **Instant Refresh:** New generated mods appear in Alphy without restarting.
 * **Multiple Engines:** Users can choose between Alphy Pro (Extreme), Alphy Pro, Alphy, and RLUPKTools.
 
-Alphy Pro (Extreme) is the default and recommended engine. Other engines are intended for cases where a specific swap does not work with the default engine.
+Alphy Pro (Extreme) is the default engine. Other engines remain available as fallback options for cases where a specific swap does not work correctly with the default engine.
 
 ### Prerequisites
 
@@ -219,6 +238,7 @@ For developers and curious users, here is how Alphy manages files locally:
 * **Backups:** Original game file backups (`.bak`) are saved to `%AppData%\Alphy\Backups`.
 * **Configuration:** Active mod states, digital seals, and saved file paths are stored at `%AppData%\Alphy\Config\settings.txt`.
 * **Discord Session:** The local authorization session is stored at `%AppData%\Alphy\Auth\session.json`.
+* **Install ID:** A random protected install ID is stored at `%AppData%\Alphy\Auth\device.json`.
 * **Plugins:** Installed plugin modules are stored in `%AppData%\Alphy\Plugins`.
 * **Exports:** Shared mod ZIPs do not include vanilla backups. Backups are recreated from the receiver's own game files when needed.
 

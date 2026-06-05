@@ -247,7 +247,6 @@ For developers and curious users, here is how Alphy manages files locally:
 ## <a id="community"></a>Community, Tools & Support
 
 * **Asset Database:** [Alphy Items Database](https://ac-storm-yt.github.io/alphy-items.github.io/)
-* **Website:** [Alphy Official Site](https://ac-storm-yt.github.io/alphy.github.io/)
 * **Discord:** [Join the Alphy Community Server](https://discord.gg/A2mrCVdpPw)
 
 ---

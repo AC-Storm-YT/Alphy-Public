@@ -2,7 +2,7 @@
 
 A Rocket League cosmetic mod manager designed for safer local file swapping, custom imports, backups, mod sharing, and plugins.
 
-> **Alphy v2.2.5 Notice:** Starting with v2.0.0, the official Alphy application is closed-source. The public repository remains available as the official README, release, download, and legacy source hub. Public source code is preserved up to **Alphy v1.7.1**.
+> **Alphy v2.3.0 Notice:** Starting with v2.0.0, the official Alphy application is closed-source. The public repository remains available as the official README, release, download, and legacy source hub. Public source code is preserved up to **Alphy v1.7.1**.
 
 > **Important:** Alphy is an external file management utility. It does **not** contain, distribute, or provide proprietary mods, paid items, or preloaded mod packs. Users import and manage their own cosmetic files.
 
@@ -15,6 +15,7 @@ A Rocket League cosmetic mod manager designed for safer local file swapping, cus
 * [Supported Categories](#categories)
 * [Discord Access & Privacy](#discord-access)
 * [How to Use Alphy](#how-to-use)
+* [Alphy Launcher](#launcher)
 * [Plugin System & Alphy Swapper](#plugins)
 * [How It Works](#how-it-works)
 * [Community, Tools & Support](#community)
@@ -79,6 +80,14 @@ Alphy includes a Plugin Manager for official tools like Alphy Swapper.
 ### Account Access Protection
 
 Alphy uses Discord authorization and a random local install ID to help prevent account access sharing. An account can only be linked to one Alphy install at a time unless the user logs out, switches account, or contacts the development team for a reset.
+
+### Alphy Launcher
+
+Alphy includes a dedicated launcher that can prepare Rocket League safely before startup. When enabled, it keeps the game clean before opening Epic Games or Steam, applies selected mods only when launching, and restores files back to vanilla after Rocket League closes.
+
+### Themes and Settings
+
+Alphy includes a Settings page for launcher behavior, mod activation preferences, streamer mode, error logging, game folder selection, update checks, and visual themes.
 
 ---
 
@@ -160,6 +169,10 @@ Alphy must be authorized with a Discord account that has access to the official 
 3. The mod appears in the grid.
 4. Toggle the mod ON and click **SAVE CHANGES**.
 
+If **Use Launcher** is enabled in Settings, **SAVE CHANGES** saves your selected mod setup without applying it immediately. The launcher applies those mods when you launch Rocket League and restores the game after Rocket League closes.
+
+If **Use Launcher** is disabled, **SAVE CHANGES** applies or removes the selected mods immediately, like older Alphy versions.
+
 ### Importing Custom Texture Mods / AlphaConsole ZIPs
 
 Alphy can import supported AlphaConsole-style `.zip` packs for custom decals, custom balls, and custom boost meters.
@@ -196,6 +209,30 @@ Exported ZIPs do not include backup files, backup folders, or temporary Alphy ex
 
 ---
 
+## <a id="launcher"></a>Alphy Launcher
+
+The Alphy Launcher is designed for users who want Alphy to handle the safest launch flow automatically.
+
+When **Use Launcher** is enabled:
+
+1. Choose your active mods in Alphy.
+2. Click **SAVE CHANGES** to save the selection.
+3. Click **LAUNCH**.
+4. Alphy prepares Rocket League, applies the saved setup, launches the game, and keeps track of the session.
+5. When Rocket League closes, Alphy restores launcher-applied files back to vanilla.
+
+This helps avoid Epic Games or Steam seeing modded files before the game starts.
+
+Launcher settings include:
+
+* **Launch without mods:** Starts Rocket League without applying the saved mod setup.
+* **Launch without Easy Anti-Cheat:** Adds the supported no-EAC launch option when available.
+* **JoyToKey compatibility:** Restarts JoyToKey in the background before launch when JoyToKey is found on the system.
+
+If Rocket League is running through the launcher, Alphy needs to stay open until the game closes so it can restore files correctly.
+
+---
+
 ## <a id="plugins"></a>Plugin System & Alphy Swapper
 
 Alphy supports official plugins through the Plugin Manager.
@@ -214,8 +251,11 @@ It integrates with Alphy:
 * **Smart Exporting:** Generated swaps are routed directly into the Alphy `mods/` folder.
 * **Instant Refresh:** New generated mods appear in Alphy without restarting.
 * **Multiple Engines:** Users can choose between Alphy Pro (Extreme), Alphy Pro, Alphy, and RLUPKTools.
+* **Clearer Swapping Flow:** The Swapper uses "Item you equip" and "Item you see" selectors with search boxes to make duplicate item names easier to manage.
 
 Alphy Pro (Extreme) is the default engine. Other engines remain available as fallback options for cases where a specific swap does not work correctly with the default engine.
+
+The Pro engines are handled internally by the official plugin build instead of being left as editable backend scripts.
 
 ### Prerequisites
 
@@ -241,6 +281,7 @@ For developers and curious users, here is how Alphy manages files locally:
 * **Install ID:** A random protected install ID is stored at `%AppData%\Alphy\Auth\device.json`.
 * **Plugins:** Installed plugin modules are stored in `%AppData%\Alphy\Plugins`.
 * **Exports:** Shared mod ZIPs do not include vanilla backups. Backups are recreated from the receiver's own game files when needed.
+* **Launcher Mode:** When launcher mode is enabled, selected mods are saved first, then applied only for the Rocket League launch session and restored after the game closes.
 
 ---
 

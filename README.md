@@ -6,7 +6,7 @@ A Rocket League cosmetic mod manager designed for safer local file swapping, cus
 
 > **Important:** Alphy is an external file management utility. It does **not** contain, distribute, or provide proprietary mods, paid items, or preloaded mod packs. Users import and manage their own cosmetic files.
 
-> ﻿⚠️ **Disclaimer:** Alphy is a third-party modding tool which goes against Epic Games ToS. Use mods at your own risk.
+> ﻿⚠️ **Disclaimer:** Alphy is a third-party modding tool which goes against Epic Games ToS. Use mods online at your own risk.
 
 ---
 
